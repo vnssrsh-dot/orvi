@@ -248,7 +248,7 @@ input.mini-sel{font-variant-numeric:tabular-nums;padding:0 10px}
 .b-team{display:flex;align-items:center;gap:8px;margin-top:16px}
 .b-team .avs .av{box-shadow:0 0 0 2px var(--bg)}
 .pill-btn{height:36px;padding:0 14px;border-radius:999px;background:var(--chip);display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:16px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:16px}
 .tabs .chip{justify-content:center;padding:0 6px}
 .note{display:flex;gap:8px;align-items:flex-start;background:var(--chip);border-radius:var(--r-sm);padding:10px 12px;font-size:12.5px;color:var(--ink-2);line-height:1.45;margin-top:12px}
 .note .i{margin-top:1px}
@@ -935,7 +935,7 @@ function tCard(t,b){const k=kindOf(t);const done=k==='done';const sd=t.subs.filt
    ${t.subs.length&&!done?`<div class="prog-mini" title="Підзадачі ${sd}/${t.subs.length}"><i style="width:${sd/t.subs.length*100}%"></i></div>`:''}</div>
   <div class="tcard-meta">${t.due?dueChip(t.due,'',done):''}${t.comments.length?`<span class="ind">${ic('msg','sm')}${t.comments.length}</span>`:''}${!done?prIcon(t.pr):''}${b.type==='shared'&&!done?av(t.who):''}</div></div>`}
 
-function vBoard(id){const b=getB(id);if(!b)return vGone();const tab=S.btab[id]||'board';const edit=canEdit(b);const owner=myRole(b)==='owner';
+function vBoard(id){const b=getB(id);if(!b)return vGone();const tab=['board','list','cal'].includes(S.btab[id])?S.btab[id]:'board';const edit=canEdit(b);const owner=myRole(b)==='owner';
  const ts=T.filter(t=>t.board===id);
  let body='';
  if(tab==='board'&&!b.stages.length){body=`<div class="empty-st"><span class="st-tile k-todo" style="width:52px;height:52px;border-radius:16px">${ic('kanban')}</span><h3>Додайте перший етап</h3><p>Етапи ділять роботу на кроки, наприклад «Плани», «В роботі», «Готово». Скільки їх буде і як вони називаються, вирішуєте ви.</p>${edit?`<button class="btn acc" data-a="sheet" data-s="addStage" data-id="${b.id}">${ic('plus')}Додати етап</button>`:''}</div>`}
@@ -957,8 +957,6 @@ function vBoard(id){const b=getB(id);if(!b)return vGone();const tab=S.btab[id]||
   body=`<div class="cal"><div class="cal-h"><button class="ibtn" data-a="calMonth" data-id="${id}" data-m="-1" aria-label="Попередній місяць">${ic('chevL')}</button><b>${cap(fMonth.format(first))}</b><button class="ibtn" data-a="calMonth" data-id="${id}" data-m="1" aria-label="Наступний місяць">${ic('chevR')}</button></div>
    <div class="cal-g">${['пн','вт','ср','чт','пт','сб','нд'].map(w=>`<span class="wd">${w}</span>`).join('')}${cells}</div></div>
    <p class="grp-h">${cap(fWeek.format(sd))}</p>${l.length?`<div class="cards">${l.map(t=>tCard(t,b)).join('')}</div>`:'<div class="empty">На цей день задач немає.</div>'}`}
- else{const fl=ts.flatMap(t=>t.files.map(f=>({f,t})));
-  body=fl.length?`<div class="list" style="margin-top:14px">${fl.map(({f,t})=>fileRow(f,t,true)).join('')}</div>`:'<div class="empty" style="margin-top:14px">Файлів поки немає. Прикріплюйте їх у картці задачі.</div>'}
  const meta=b.type==='shared'?(b.team?esc(b.team):'Спільна дошка'):'Особиста дошка';
  return `<div class="screen"><div class="top"><button class="ibtn" data-a="back" aria-label="Назад">${ic('back')}</button><span class="spacer"></span>
   <button class="ibtn" data-a="sheet" data-s="boardNotif" data-id="${b.id}" aria-label="Сповіщення дошки" title="${esc(bnSummary(b))}">${ic(b.notif.on?'bell':'bellOff')}</button>
@@ -967,7 +965,7 @@ function vBoard(id){const b=getB(id);if(!b)return vGone();const tab=S.btab[id]||
  <div class="scroll"><div class="b-head">${edit?`<button class="tile-btn" data-a="sheet" data-s="boardIcon" data-id="${b.id}" aria-label="Змінити іконку дошки">${tile(b,'big')}<span class="tile-edit">${ic('edit','sm')}</span></button>`:tile(b,'big')}<div style="min-width:0"><h1>${esc(b.name)}</h1><p>${esc(b.desc)||meta}</p></div></div>
   ${b.type==='shared'||b.members.length>1?`<div class="b-team">${avs(b.members.map(m=>m.u),4,'lg')}${owner?`<button class="plus-c" style="width:34px;height:34px" data-a="sheet" data-s="members" data-id="${b.id}" aria-label="Запросити">${ic('plus','sm')}</button>`:''}<span class="spacer"></span><button class="pill-btn" data-a="sheet" data-s="members" data-id="${b.id}">${ic('users','sm')}${owner?'Керування':'Учасники'}</button></div>`:''}
   ${b.type==='shared'||b.members.length>1?`<button class="my-role" data-a="sheet" data-s="members" data-id="${b.id}">${ic(ROLE_IC[myRole(b)]||'eye')}<div><span>Ваша роль: <b>${ROLE[myRole(b)]}</b></span><small>${ROLE_SELF[myRole(b)]}</small></div>${ic('chevR','sm')}</button>`:''}
-  <div class="tabs">${[['board','Дошка'],['list','Список'],['cal','Календар'],['files','Файли']].map(([k,l])=>`<button class="chip ${tab===k?'on':''}" data-a="btab" data-id="${id}" data-t="${k}">${l}</button>`).join('')}</div>
+  <div class="tabs">${[['board','Дошка'],['list','Список'],['cal','Календар']].map(([k,l])=>`<button class="chip ${tab===k?'on':''}" data-a="btab" data-id="${id}" data-t="${k}">${l}</button>`).join('')}</div>
   ${body}<div style="height:60px"></div></div>
   ${edit&&b.stages.length?`<button class="fab" data-a="sheet" data-s="quickAdd" data-id="${b.id}" aria-label="Нова задача">${ic('plus')}</button>`:''}</div>`}
 
@@ -994,9 +992,7 @@ function vTask(id){const t=getT(id);if(!t)return vGone();const b=getB(t.board);c
    <div class="field">${ic('tag')}<span>Мітки</span><div class="fv">${labels}${edit?`<button class="plus-c" data-a="sheet" data-s="label" data-id="${t.id}" aria-label="Додати мітку">${ic('plus','sm')}</button>`:labels?'':'<span class="ro">немає</span>'}</div></div>
    <div class="field">${ic('user')}<span>Відповідальний</span><div class="fv"><button class="vchip" data-a="sheet" data-s="who" data-id="${t.id}" ${dis}>${av(t.who)}${esc(U[t.who].f)}${edit&&b.members.length>1?ic('chevD','sm'):''}</button></div></div>
    ${b.members.length>1?`<div class="field">${ic('users')}<span>Співучасники</span><div class="fv">${t.people.length?avs(t.people,5,'md'):'<span class="ro">немає</span>'}${edit?`<button class="plus-c" data-a="sheet" data-s="people" data-id="${t.id}" aria-label="Додати співучасників">${ic('plus','sm')}</button>`:''}</div></div>`:''}
-   <div class="field">${ic('file')}<span>Файли</span><div class="fv"><button class="vchip" data-a="toggleFiles" data-id="${t.id}">${t.files.length?pl(t.files.length,W.file):'Немає'}${ic(S.filesOpen[t.id]?'chevD':'chevR','sm')}</button></div></div>
   </div>
-  ${S.filesOpen[t.id]?`<div class="list" style="margin-top:6px">${t.files.map(f=>fileRow(f,t)).join('')}${edit?`<label class="add-row" style="cursor:pointer">${ic('clip')}Прикріпити файл<input type="file" id="file-${t.id}" data-bind="file" data-id="${t.id}" hidden></label>`:''}</div>`:''}
   <div class="hr"></div>
   <div class="subs-h">${ic('subs')}<h3>Підзадачі</h3><span class="n">${sd}/${t.subs.length}</span></div>
   ${t.subs.map(s=>`<div class="sub"><button class="ck sq ${s.st==='done'?'on':s.st==='prog'?'half':''}" data-a="subCycle" data-id="${t.id}" data-sub="${s.id}" ${dis} aria-label="Статус: ${SUB_ST[s.st]}">${s.st==='done'?ic('check','sm'):''}</button>
@@ -1007,7 +1003,7 @@ function vTask(id){const t=getT(id);if(!t)return vGone();const b=getB(t.board);c
   <div class="subs-h">${ic('msg')}<h3>Коментарі</h3><span class="n">${t.comments.length}</span></div>
   ${t.comments.map(c=>`<div class="cm">${av(c.u,'md')}<div><b>${esc(U[c.u].f)}</b> <small>${esc(when(c))}</small><p>${esc(c.t)}</p></div></div>`).join('')||'<p class="ro">Коментарів поки немає.</p>'}
   <div style="height:8px"></div></div>
-  ${edit?`<form class="composer" data-f="comment" data-id="${t.id}"><label class="ibtn" style="cursor:pointer" aria-label="Прикріпити файл">${ic('clip')}<input type="file" id="cfile-${t.id}" data-bind="file" data-id="${t.id}" hidden></label><input id="cm-${t.id}" placeholder="Додати коментар…" autocomplete="off" aria-label="Коментар"><button class="send" aria-label="Надіслати">${ic('send')}</button></form>`:''}</div>`}
+  ${edit?`<form class="composer" data-f="comment" data-id="${t.id}"><input id="cm-${t.id}" placeholder="Додати коментар…" autocomplete="off" aria-label="Коментар"><button class="send" aria-label="Надіслати">${ic('send')}</button></form>`:''}</div>`}
 
 function vSettings(){const n=S.notif;const sw=(k,l,d)=>`<button class="set-r" data-a="notif" data-k="${k}" role="switch" aria-checked="${n[k]}"><div>${l}${d?`<small>${d}</small>`:''}</div><span class="sw ${n[k]?'on':''}"></span></button>`;
  return `<div class="screen"><div class="top"><button class="ibtn" data-a="back" aria-label="Назад">${ic('back')}</button><span class="spacer"></span></div>
