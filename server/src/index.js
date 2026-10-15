@@ -88,9 +88,40 @@ async function sendTo(env, userId, html, button) {
   const base = await appUrl(env);
   const body = { chat_id: userId, text: html, parse_mode: 'HTML', disable_web_page_preview: true };
   if (button && base) body.reply_markup = { inline_keyboard: [[{ text: button.text, web_app: { url: base + '/' + (button.start ? '?startapp=' + encodeURIComponent(button.start) : '') } }]] };
+  // Through the queue when it is configured: Telegram rate limits are respected and failed sends are retried.
+  if (env.MSG_QUEUE) {
+    try { await env.MSG_QUEUE.send(body); return true; }
+    catch (e) { console.log('queue unavailable, sending directly:', String(e)); }
+  }
+  const r = await deliver(env, body);
+  return r.ok;
+}
+
+// One Telegram sendMessage call. 403 = the person blocked the bot: stop writing to them.
+async function deliver(env, body) {
   const r = await tg(env, 'sendMessage', body);
-  if (!r.ok && r.error_code === 403) await env.DB.prepare('UPDATE users SET chat_ok=0 WHERE id=?').bind(userId).run();
-  return !!r.ok;
+  if (!r.ok && r.error_code === 403) await env.DB.prepare('UPDATE users SET chat_ok=0 WHERE id=?').bind(body.chat_id).run();
+  return r;
+}
+
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+const GLOBAL_GAP = 40, CHAT_GAP = 1050; // Telegram: ~30 messages/second overall, 1/second per chat
+
+// Queue consumer (max_concurrency = 1, so this is the only sender at any moment).
+async function consume(batch, env) {
+  const lastByChat = new Map();
+  for (const msg of batch.messages) {
+    const body = msg.body;
+    const wait = CHAT_GAP - (Date.now() - (lastByChat.get(body.chat_id) || 0));
+    if (wait > 0) await sleep(wait);
+    const r = await deliver(env, body);
+    lastByChat.set(body.chat_id, Date.now());
+    if (r.ok) msg.ack();
+    else if (r.error_code === 429) msg.retry({ delaySeconds: Math.min(60, Math.max(1, (r.parameters && r.parameters.retry_after) || 5)) });
+    else if (r.error_code >= 400 && r.error_code < 500) { console.log('dropped message', r.error_code, r.description); msg.ack(); } // retrying cannot help
+    else msg.retry({ delaySeconds: Math.min(600, 5 * 2 ** Math.min(msg.attempts || 1, 7)) }); // network / Telegram outage
+    await sleep(GLOBAL_GAP);
+  }
 }
 
 /* ---------- prefs helpers ---------- */
@@ -665,4 +696,5 @@ export default {
     return env.ASSETS ? env.ASSETS.fetch(req) : new Response('Not found', { status: 404 });
   },
   async scheduled(event, env, ctx) { ctx.waitUntil(scheduled(env)); },
+  async queue(batch, env) { await init(env); await consume(batch, env); },
 };
