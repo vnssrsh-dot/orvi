@@ -1051,7 +1051,7 @@ function privacyText(){const P=(h,b)=>`<h2 class="pp-h">${h}</h2>${b}`;const L=a
  ${P('6. Безпека',`<p class="pp-p">Дані передаються лише зашифрованим зʼєднанням (HTTPS). Сервер перевіряє, що кожен запит надійшов від вашого акаунта Telegram, і дозволяє змінювати дошку тільки відповідно до вашої ролі.</p>`)}
  ${P('7. Діти',`<p class="pp-p">orvi. не призначений для дітей, молодших за вік, з якого Telegram дозволяє користуватися сервісом.</p>`)}
  ${P('8. Зміни політики',`<p class="pp-p">Якщо ми суттєво змінимо політику, застосунок покаже нову редакцію й попросить прийняти її знову.</p>`)}
- ${P('9. Звʼязок',`<p class="pp-p">З питань щодо даних пишіть боту <b>@${BOT}</b>.</p>`)}`}
+`}
 function vPrivacy(){return `<div class="screen"><div class="top"><button class="ibtn" data-a="back" aria-label="Назад">${ic('back')}</button><span class="spacer"></span></div>
  <div class="scroll"><h1 class="h1">Політика конфіденційності</h1><div class="pp">${privacyText()}</div><button class="btn ghost" style="margin-top:18px" data-a="back">Назад</button></div></div>`}
 const consentNeeded=()=>window.ORVI_APP?(S.privacy!==PRIVACY_VER&&!S.loading):(S.mode==='empty'&&S.privacy!==PRIVACY_VER);
