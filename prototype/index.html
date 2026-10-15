@@ -854,9 +854,9 @@ function vHome(){const h=homeData();const name=U.me.voc;
   return `<section class="sec"><div class="sec-h"><h2>${title}</h2><span class="count">${items.length}</span>
    ${items.length>3?`<button class="more" data-a="showAll" data-k="${key}">${S.showAll[key]?'Згорнути':'Усі'} ${ic(S.showAll[key]?'chevD':'arrow','sm')}</button>`:''}</div>
    <div class="list">${show.length?show.map(taskRow).join(''):`<div class="empty">${empty}</div>`}</div></section>`};
- const LB=B.filter(live);const s1=LB.length>0,s2=T.some(t=>live(getB(t.board))),s3=LB.some(b=>b.members.length>1);const fb=LB[0];const fresh=!(s1&&s2&&s3)&&S.mode==='empty';
+ const LB=B.filter(live);const s1=LB.length>0,s2=T.some(t=>live(getB(t.board))),s3=LB.some(b=>b.members.length>1);const fb=LB[0];const fresh=!(s1&&s2&&s3)&&S.mode==='empty'&&!S.onbHidden;
  const step=(n,done,on,act,t,d)=>`<${on?'button':'div'} class="onb-s ${done?'done':''} ${on?'':'off'}" ${on?act:''}><span class="n">${done?ic('check','sm'):n}</span><div><b>${t}</b><small>${d}</small></div>${on&&!done?ic('chevR','sm'):''}</${on?'button':'div'}>`;
- const onb=`<div class="onb"><p class="onb-t">Три кроки до порядку</p>
+ const onb=`<div class="onb"><div style="display:flex;align-items:baseline;gap:8px"><p class="onb-t" style="flex:1">Три кроки до порядку</p>${s1?`<button class="ro" style="font-weight:600" data-a="hideOnb">Сховати</button>`:''}</div>
   ${step(1,s1,true,'data-a="sheet" data-s="create"','Створіть першу дошку','Особисту чи спільну для команди')}
   ${step(2,s2,s1,fb?`data-a="openBoard" data-id="${fb.id}"`:'','Додайте етапи й задачі','Етапи називаєте так, як зручно вам')}
   ${step(3,s3,s1,fb?`data-a="sheet" data-s="members" data-id="${fb.id}"`:'','Запросіть людей','За @username або посиланням')}</div>`;
@@ -1020,6 +1020,7 @@ function vSettings(){const n=S.notif;const sw=(k,l,d)=>`<button class="set-r" da
   <p class="set-t">Сповіщення дошок</p><div class="set-g">${B.filter(live).map(b=>`<button class="set-r" data-a="sheet" data-s="boardNotif" data-id="${b.id}">${tile(b,'xs')}<div>${esc(b.name)}<small>${esc(bnSummary(b))}</small></div>${ic(b.notif.on?'chevR':'bellOff','sm')}</button>`).join('')||'<p class="prose">Дошок поки немає.</p>'}</div>
   <p class="ro" style="margin:8px 4px 0">Для кожної дошки окремо: вимкнути сповіщення, отримувати добірку задач у потрібний час і вибрати події.</p>
   <p class="set-t">Доступ і приватність</p><div class="set-g"><p class="prose">Особисті дошки бачите лише ви. Якщо надати доступ до однієї дошки, інші залишаються приватними. Учасники спільної дошки бачать тільки її вміст. Керувати учасниками конкретної дошки можна всередині неї.</p></div>
+  ${window.ORVI_APP?`<p class="set-t">Дані</p><div class="set-g"><p class="prose" style="padding-bottom:4px">Ваші дошки й налаштування зберігаються в Telegram і відкриваються на будь-якому вашому пристрої.</p><button class="set-r" data-a="sheet" data-s="resetData" style="color:var(--danger)">${ic('trash')}<div>Почати спочатку<small>Видалити всі дошки, задачі й налаштування</small></div></button></div>`:''}
   <p class="set-t">Допомога</p><div class="set-g">
    ${[['boards','Дошки та етапи'],['subs','Підзадачі й відповідальні'],['roles','Запрошення та ролі']].map(([k,l])=>`<button class="set-r" data-a="sheet" data-s="help" data-k="${k}"><div>${l}</div>${ic('chevR','sm')}</button>`).join('')}</div>
   <p class="lede" style="text-align:center;margin:24px 0 8px"><span class="wm" style="font-size:16px">orvi<b>.</b></span> · прототип 0.1</p></div></div>`}
@@ -1048,7 +1049,7 @@ function vSheet(){const sh=S.sheet;if(!sh)return'';const t=sh.id&&getT(sh.id);
  case 'join':{const r=sh.res;const inv=r&&r.ok?(INV.find(i=>i.link===r.code)||LINK_ONLY.find(i=>i.link===r.code)):null;
   return sheetWrap('Приєднатися за посиланням',`<p class="lede" style="margin:0">Вставте посилання-запрошення, яке вам надіслали в Telegram.</p>
   <input class="inp" id="join-link" data-bind="sf" data-k="link" value="${esc(sh.link||'')}" placeholder="t.me/orvi_bot/app?startapp=join_…" autocomplete="off">
-  <p class="lab">Приклади посилань для прев'ю</p><div class="fv">${LINK_ONLY.map(i=>`<button class="vchip" data-a="sf" data-k="link" data-v="https://t.me/orvi_bot/app?startapp=${i.link}">${ic(ROLE_IC[i.role],'sm')}${ROLE[i.role]}</button>`).join('')}</div>
+  ${window.ORVI_APP?'':`<p class="lab">Приклади посилань для прев'ю</p>`}<div class="fv" ${window.ORVI_APP?'hidden':''}>${LINK_ONLY.map(i=>`<button class="vchip" data-a="sf" data-k="link" data-v="https://t.me/orvi_bot/app?startapp=${i.link}">${ic(ROLE_IC[i.role],'sm')}${ROLE[i.role]}</button>`).join('')}</div>
   <button class="btn acc" data-a="checkLink">Перевірити посилання</button>
   ${r&&!r.ok?`<p class="err">${r.msg}</p>`:''}
   ${inv?`<div class="preview-card"><span class="tile ${inv.tint}">${ic(inv.icon)}</span><div style="flex:1"><b style="font-family:var(--f-display);font-weight:500;font-size:16px">${esc(inv.name)}</b><small style="display:block;color:var(--muted);font-size:12px;margin-top:2px">${esc(U[inv.from].f)} запрошує · ${pl(inv.people,W.mem)}</small></div></div>
@@ -1148,6 +1149,7 @@ function vSheet(){const sh=S.sheet;if(!sh)return'';const t=sh.id&&getT(sh.id);
  case 'boardNotif':{const b=getB(sh.id);if(!b)return'';return sheetWrap('Сповіщення · '+esc(b.name),vBoardNotif(b))}
  case 'purgeBoard':{const b=getB(sh.id);if(!b)return'';return sheetWrap('Видалити назавжди?',`<p class="lede" style="margin:0">«${esc(b.name)}» і ${pl(T.filter(t=>t.board===b.id).length,W.task)} буде видалено без можливості відновлення.</p><div class="btn-row"><button class="btn ghost" data-a="close">Скасувати</button><button class="btn acc" style="background:var(--danger)" data-a="purgeBoard" data-id="${b.id}">Видалити назавжди</button></div>`)}
  case 'emptyTrash':{const n=B.filter(b=>b.deletedAt&&b.type===sh.bt).length;return sheetWrap('Очистити кошик?',`<p class="lede" style="margin:0">${pl(n,['дошка','дошки','дощок'])} разом із задачами буде видалено назавжди. Відновити їх уже не вийде.</p><div class="btn-row"><button class="btn ghost" data-a="close">Скасувати</button><button class="btn acc" style="background:var(--danger)" data-a="emptyTrash" data-bt="${sh.bt}">Очистити</button></div>`)}
+ case 'resetData':return sheetWrap('Почати спочатку?',`<p class="lede" style="margin:0">Усі ваші дошки, задачі, кошик і налаштування буде видалено. Застосунок відкриється, як для нового користувача.</p><div class="btn-row"><button class="btn ghost" data-a="close">Скасувати</button><button class="btn acc" style="background:var(--danger)" data-a="resetData">Видалити все</button></div>`);
  case 'help':{const H={boards:['Дошки та етапи','Кожна дошка має власні етапи, розташовані вертикально. Розгортайте й згортайте їх, додавайте задачі та переносьте між етапами. Назви й кількість етапів налаштовуються в меню етапу.'],subs:['Підзадачі й відповідальні','Відповідальний відповідає за результат усієї задачі. Підзадачі можуть мати інших виконавців, свої терміни та статуси. Призначені вам підзадачі з\'являються на головній з посиланням на початкову дошку, без копій.'],roles:['Запрошення та ролі','Власник керує дошкою й учасниками, редактор працює із задачами, спостерігач лише переглядає. Запросити можна за @username або посиланням, яке дає доступ тільки до однієї дошки.']}[sh.k];
   return sheetWrap(H[0],`<p class="lede" style="margin:0;font-size:14px;line-height:1.6;color:var(--ink-2)">${H[1]}</p><button class="btn ghost" data-a="close">Закрити</button>`)}
  }return''}
@@ -1371,6 +1373,8 @@ const A={
  bnDay:d=>{const b=getB(d.id);const n=Number(d.d);const a=b.notif.digest.days;b.notif.digest.days=a.includes(n)?a.filter(x=>x!==n):[...a,n]},
  bnDays:d=>{getB(d.id).notif.digest.days=d.d.split(',').map(Number)},
  quietToggle:()=>{S.quiet.on=!S.quiet.on},
+ hideOnb:()=>{S.onbHidden=true},
+ resetData:()=>{window.orviReset&&window.orviReset();return false},
  stageSuggest:d=>{S.sheet.name=d.n;S.sheet.kind=d.k;S.sheet.err=null},
  createStage:d=>{const sh=S.sheet;const v=(sh.name||'').trim();if(!v){sh.err='Вкажіть назву етапу';return}const b=getB(d.id);b.stages.push({id:nid('st'),name:v,kind:sh.kind||'todo',icon:sh.icon||null,tint:sh.tint||''});S.sheet=null;toast('Етап додано')},
  botBoard:d=>{S.tab='home';S.stacks.home=[];S.sheet=null;push('board',d.id)},
