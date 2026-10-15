@@ -205,6 +205,8 @@
 
   async function refresh() {
     if (dead || document.hidden || syncing || changes() || S.sheet) return;
+    const ae = document.activeElement; // never swap text under someone who is typing
+    if (ae && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName) && document.getElementById('app').contains(ae)) return;
     if ((typeof td !== 'undefined' && td) || (typeof drag !== 'undefined' && drag)) return;
     const st = await call('state');
     if (st.error === 'unauthorized') { expired(); return; }
@@ -226,7 +228,32 @@
     leave: async board => { await flush(); return call('leave', { board }); },
     forget: board => { base.b.delete(board); base.bp.delete(board); for (const [id, s] of base.t) if (JSON.parse(s).board === board) base.t.delete(id); },
     reload: () => reload(false),
+    // "someone is editing" presence: report my focused field, keep it alive while focused
+    editing: (mine, clearTask) => {
+      clearInterval(presTimer);
+      if (!mine) { lastPres = ''; if (clearTask) call('presence', { task: clearTask, field: null }); return; }
+      const send = () => {
+        if (!PRES.mine) return;
+        call('presence', { task: PRES.mine.task, field: PRES.mine.field }).then(r => { if (r.ok) setOthers(PRES.mine ? PRES.mine.task : mine.task, r.others); });
+        lastPres = mine.task + '|' + mine.field; lastPresAt = Date.now();
+      };
+      if (lastPres !== mine.task + '|' + mine.field || Date.now() - lastPresAt > 7000) send();
+      presTimer = setInterval(send, 8000);
+    },
   };
+  let presTimer = null, lastPres = '', lastPresAt = 0;
+  function setOthers(task, others) { PRES.others[task] = (others || []).map(o => ({ u: K(o.u), field: o.field })); paintPresence(); }
+  function openTaskId() { const v = topE(); if (S.sheet && S.sheet.type === 'sub') return S.sheet.id; return v && v.v === 'task' ? v.id : null; }
+  setInterval(async () => {
+    if (dead || document.hidden) return;
+    const id = openTaskId();
+    if (!id) { if (Object.keys(PRES.others).length) { PRES.others = {}; paintPresence(); } return; }
+    const r = await call('presence', { task: id, peek: true });
+    if (r.ok) setOthers(id, r.others);
+  }, 4000);
+  // typed text (title, description, subtasks) is saved a moment after typing stops, not only on the next tap
+  document.addEventListener('input', e => { if (e.target && e.target.dataset && e.target.dataset.bind) schedule(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && PRES.mine) { const t = PRES.mine.task; PRES.mine = null; window.orviApi.editing(null, t); } });
   window.orviReset = async function () {
     await flush();
     const r = await call('reset', {});

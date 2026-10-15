@@ -220,6 +220,13 @@ h1,h2,h3{font-family:var(--f-display);font-weight:500;margin:0;text-wrap:balance
 .days button{height:36px;border-radius:10px;background:var(--chip);font-size:12.5px;font-weight:600;color:var(--ink-2)}
 .days button.on{background:var(--accent);color:#fff}
 input.mini-sel{font-variant-numeric:tabular-nums;padding:0 10px}
+.presence:empty{display:none}
+.presence{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.pres{display:flex;align-items:flex-start;gap:9px;background:var(--tile-lilac);color:var(--ink);border-radius:12px;padding:9px 12px;font-size:12.5px;line-height:1.45;animation:fade .2s}
+.pres.warn{background:var(--accent-soft);color:var(--accent-text)}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;margin-top:5px;animation:pdot 1.2s ease-in-out infinite}
+@keyframes pdot{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.pdot{animation:none}}
 .pg-btn{height:34px;padding:0 14px;border-radius:999px;background:var(--card);display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;box-shadow:var(--shadow)}
 .tile .i{width:24px;height:24px;stroke-width:1.5}
 .tile.big{width:72px;height:72px;border-radius:20px}
@@ -980,6 +987,7 @@ function vTask(id){const t=getT(id);if(!t)return vGone();const b=getB(t.board);c
   <button class="crumb" data-a="openBoard" data-id="${b.id}">${tile(b,'xs')}${esc(b.name)}<span style="color:var(--muted)">·</span>${esc(st?.name||'')}</button>
   <div class="t-head"><button class="ck ${done?'on':''}" data-a="toggleDone" data-id="${t.id}" ${dis} aria-label="Позначити виконаною">${done?ic('check'):''}</button>
    <textarea class="t-title" id="tt-${t.id}" data-bind="title" data-id="${t.id}" rows="1" ${edit?'':'readonly'} aria-label="Назва задачі">${esc(t.title)}</textarea></div>
+  <div class="presence" data-task="${t.id}" aria-live="polite">${presenceFor(t.id)}</div>
   <textarea class="desc" id="td-${t.id}" data-bind="desc" data-id="${t.id}" placeholder="Додайте опис…" ${edit?'':'readonly'} aria-label="Опис">${esc(t.desc)}</textarea>
   <div class="fields">
    <div class="field">${ic('shapes')}<span>Іконка</span><div class="fv"><button class="vchip" data-a="sheet" data-s="taskIcon" data-id="${t.id}" ${dis}>${t.icon?`<span class="tile xs ${t.tint||''}" style="width:22px;height:22px;border-radius:7px">${ic(t.icon,'sm')}</span>${esc(ICON_NAME[t.icon]||'')}`:'Без іконки'}${edit?ic('chevD','sm'):''}</button></div></div>
@@ -1002,6 +1010,19 @@ function vTask(id){const t=getT(id);if(!t)return vGone();const b=getB(t.board);c
   ${t.comments.map(c=>`<div class="cm">${av(c.u,'md')}<div><b>${esc(U[c.u].f)}</b> <small>${esc(when(c))}</small><p>${esc(c.t)}</p></div></div>`).join('')||'<p class="ro">Коментарів поки немає.</p>'}
   <div style="height:8px"></div></div>
   ${edit?`<form class="composer" data-f="comment" data-id="${t.id}"><input id="cm-${t.id}" placeholder="Додати коментар…" autocomplete="off" aria-label="Коментар"><button class="send" aria-label="Надіслати">${ic('send')}</button></form>`:''}</div>`}
+
+/* ---------- "someone is editing" banner ---------- */
+// others: [{u: userKey, field}]; field = title | desc | sub:<id>:title | sub:<id>:note
+const PRES={others:{},mine:null};
+function fieldLabel(t,f){if(f==='title')return'назву задачі';if(f==='desc')return'опис';const m=/^sub:(.+):(title|note)$/.exec(f||'');const s=m&&t&&t.subs.find(x=>x.id===m[1]);return s?(m[2]==='note'?`деталі підзадачі «${esc(s.title)}»`:`підзадачу «${esc(s.title)}»`):'задачу'}
+function presenceFor(taskId){const t=getT(taskId);const list=(PRES.others[taskId]||[]).filter(o=>U[o.u]);if(!list.length)return'';
+ return list.map(o=>{const same=PRES.mine&&PRES.mine.task===taskId&&PRES.mine.field===o.field;
+  return `<div class="pres ${same?'warn':''}" role="status"><span class="pdot"></span><span>${same?`<b>${esc(U[o.u].f)}</b> теж редагує ${fieldLabel(t,o.field)}. Збережеться версія того, хто закінчить останнім, тож краще домовтеся.`:`<b>${esc(U[o.u].f)}</b> зараз редагує ${fieldLabel(t,o.field)}`}</span></div>`}).join('')}
+function paintPresence(){document.querySelectorAll('.presence[data-task]').forEach(el=>{const h=presenceFor(el.dataset.task);if(el.innerHTML!==h)el.innerHTML=h})}
+function presField(el){const b=el&&el.dataset&&el.dataset.bind;if(b==='title'||b==='desc')return b;if(b==='subTitle')return'sub:'+el.dataset.sub+':title';if(b==='subNote')return'sub:'+el.dataset.sub+':note';return null}
+document.addEventListener('focusin',e=>{const f=presField(e.target);if(!f)return;PRES.mine={task:e.target.dataset.id,field:f};paintPresence();if(window.orviApi)orviApi.editing(PRES.mine)});
+document.addEventListener('focusout',e=>{if(!presField(e.target))return;setTimeout(()=>{if(presField(document.activeElement))return;const was=PRES.mine;PRES.mine=null;paintPresence();if(window.orviApi&&was)orviApi.editing(null,was.task)},80)});
+if(!window.ORVI_APP)PRES.others.video=[{u:'anton',field:'desc'}]; // preview: Anton is editing the description
 
 function vSettings(){const n=S.notif;const sw=(k,l,d)=>`<button class="set-r" data-a="notif" data-k="${k}" role="switch" aria-checked="${n[k]}"><div>${l}${d?`<small>${d}</small>`:''}</div><span class="sw ${n[k]?'on':''}"></span></button>`;
  return `<div class="screen"><div class="top"><button class="ibtn" data-a="back" aria-label="Назад">${ic('back')}</button><span class="spacer"></span></div>
@@ -1097,7 +1118,7 @@ function vSheet(){const sh=S.sheet;if(!sh)return'';const t=sh.id&&getT(sh.id);
  case 'label':return t?sheetWrap('Нова мітка',`<form data-f="addLabel" data-id="${t.id}" style="display:grid;gap:12px"><input class="inp" id="lbl-in" placeholder="Наприклад, Відео" autocomplete="off"><div class="fv">${['Терміново','Відео','SMM','Тексти','Дизайн'].filter(l=>!t.labels.includes(l)).map(l=>`<button type="button" class="vchip" data-a="addLabelQuick" data-id="${t.id}" data-v="${l}">${l}</button>`).join('')}</div><button class="btn acc">Додати</button></form>
   ${t.labels.length?`<p class="lab">Додані</p><div class="fv">${t.labels.map(l=>`<button class="vchip" data-a="rmLabel" data-id="${t.id}" data-v="${esc(l)}">${esc(l)}<span class="x">${ic('x','sm')}</span></button>`).join('')}</div>`:''}`):'';
  case 'sub':{if(!t)return'';const s=t.subs.find(x=>x.id===sh.sub);if(!s)return'';const b=getB(t.board);const edit=canEdit(b);const dis=edit?'':'disabled';
-  return sheetWrap('Підзадача',`<button class="crumb" style="margin:0;justify-self:start;align-self:flex-start" data-a="close">${tile(b,'xs')}${esc(b.name)} · «${esc(t.title)}»</button>
+  return sheetWrap('Підзадача',`<div class="presence" data-task="${t.id}" aria-live="polite">${presenceFor(t.id)}</div><button class="crumb" style="margin:0;justify-self:start;align-self:flex-start" data-a="close">${tile(b,'xs')}${esc(b.name)} · «${esc(t.title)}»</button>
   <input class="inp" id="st-${s.id}" data-bind="subTitle" data-id="${t.id}" data-sub="${s.id}" value="${esc(s.title)}" ${edit?'':'readonly'} aria-label="Назва підзадачі">
   <p class="lab">Статус</p><div class="seg">${Object.entries(SUB_ST).map(([k,l])=>`<button class="${s.st===k?'on':''}" data-a="subSet" data-id="${t.id}" data-sub="${s.id}" data-v="${k}" ${dis}>${l}</button>`).join('')}</div>
   <div class="btn-row"><div style="flex:1"><p class="lab" style="margin-bottom:8px">Виконавець</p><select class="inp" id="sw-${s.id}" data-bind="subWho" data-id="${t.id}" data-sub="${s.id}" ${dis}>${b.members.filter(m=>m.r!=='viewer').map(m=>`<option value="${m.u}" ${s.who===m.u?'selected':''}>${esc(U[m.u].n)}</option>`).join('')}</select></div>

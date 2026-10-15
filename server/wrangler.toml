@@ -33,14 +33,13 @@ head_sampling_rate = 1
 invocation_logs = true
 
 # Bot message queue: rate-limited delivery with retries.
-# Create the queue first (Compute -> Queues -> Create -> "orvi-messages"), then uncomment:
-# [[queues.producers]]
-# queue = "orvi-messages"
-# binding = "MSG_QUEUE"
-#
-# [[queues.consumers]]
-# queue = "orvi-messages"
-# max_batch_size = 25
-# max_batch_timeout = 2
-# max_retries = 8
-# max_concurrency = 1
+[[queues.producers]]
+queue = "orvi-messages"
+binding = "MSG_QUEUE"
+
+[[queues.consumers]]
+queue = "orvi-messages"
+max_batch_size = 25
+max_batch_timeout = 2
+max_retries = 8
+max_concurrency = 1

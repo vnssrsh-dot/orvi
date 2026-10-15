@@ -20,6 +20,7 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS links_board ON links(board_id)`,
   `CREATE TABLE IF NOT EXISTS sent (key TEXT PRIMARY KEY, at INTEGER)`,
   `CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)`,
+  `CREATE TABLE IF NOT EXISTS presence (task_id TEXT, user_id INTEGER, field TEXT, until INTEGER, PRIMARY KEY (task_id, user_id))`,
 ];
 
 const ROLES = ['owner', 'editor', 'viewer'];
@@ -480,6 +481,21 @@ async function api(req, env, path) {
       await env.DB.prepare(`INSERT INTO meta (key, value) VALUES ('app_url', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value`).bind(new URL(req.url).origin).run();
     }
     return json(await state(env, me));
+  }
+  if (path === 'presence') {
+    // Who is editing which field of a task right now. Entries live 20 s and are refreshed while the field has focus.
+    const task = String(body.task || '');
+    const row = await env.DB.prepare('SELECT board_id FROM tasks WHERE id=?').bind(task).first();
+    const role = row && await roleOf(env, row.board_id, me);
+    if (!role) return json({ ok: false, error: 'forbidden' });
+    if (!body.peek) {
+      const field = typeof body.field === 'string' && /^(title|desc|sub:[A-Za-z0-9_-]{1,64}:(title|note))$/.test(body.field) ? body.field : null;
+      if (field && role !== 'viewer') await env.DB.prepare('INSERT INTO presence (task_id, user_id, field, until) VALUES (?,?,?,?) ON CONFLICT(task_id, user_id) DO UPDATE SET field=excluded.field, until=excluded.until').bind(task, me, field, now() + 20000).run();
+      else await env.DB.prepare('DELETE FROM presence WHERE task_id=? AND user_id=?').bind(task, me).run();
+      await env.DB.prepare('DELETE FROM presence WHERE until<?').bind(now() - 60000).run();
+    }
+    const others = (await env.DB.prepare('SELECT user_id u, field FROM presence WHERE task_id=? AND user_id<>? AND until>?').bind(task, me, now()).all()).results;
+    return json({ ok: true, others });
   }
   if (path === 'chatok') { await env.DB.prepare('UPDATE users SET chat_ok=1 WHERE id=?').bind(me).run(); return json({ ok: true }); }
   if (path === 'reset') {
