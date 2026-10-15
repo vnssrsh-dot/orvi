@@ -11,7 +11,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "orvi"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "5645d88e-eb5a-43f2-80b2-4ba31310f263"
 
 # Daily digests and due-date reminders are checked every 5 minutes.
 [triggers]

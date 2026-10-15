@@ -44,7 +44,7 @@ npx wrangler login                       # вход в Cloudflare в брауз�
 npx wrangler d1 create orvi              # создаст базу и покажет database_id
 ```
 
-1. Вставьте показанный `database_id` в `server/wrangler.toml` вместо `REPLACE_WITH_YOUR_D1_DATABASE_ID`.
+1. Укажите `database_id` своей базы в `server/wrangler.toml` (сейчас там id базы orvi в аккаунте владельца).
 2. Добавьте секреты. Каждая команда попросит ввести значение:
    ```bash
    npx wrangler secret put BOT_TOKEN        # токен бота из @BotFather
