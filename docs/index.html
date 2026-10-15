@@ -708,6 +708,8 @@ const ROLE={owner:'Власник',editor:'Редактор',viewer:'Спост�
 const ROLE_CAN={owner:'Ви зможете керувати дошкою, учасниками та доступом нарівні з власником.',editor:'Ви зможете створювати й змінювати задачі та підзадачі.',viewer:'Ви зможете переглядати задачі та коментарі без змін.'};
 const ROLE_IC={owner:'crown',editor:'pencil',viewer:'eye'};const ROLE_ACC={owner:'власник',editor:'редактор',viewer:'спостерігач'};
 const ROLE_SELF={owner:'Керуєте дошкою, учасниками та доступом.',editor:'Можете створювати й змінювати задачі та підзадачі.',viewer:'Можете переглядати задачі та коментарі без змін.'};
+const INV_ERR={not_started:'Ця людина ще не запускала @orvi_task_bot, тож бот не може їй написати. Надішліть їй посилання-запрошення нижче.',member:'Ця людина вже є на дошці.',self:'Не можна запросити самого себе.',forbidden:'Запрошувати людей може лише власник дошки.',bad_username:'Перевірте username: латиниця, цифри та _, від 4 символів.'};
+const LINK_ERR={invalid:'Посилання недійсне. Попросіть надіслати нове.',expired:'Термін дії посилання минув. Попросіть надіслати нове.',full:'За цим посиланням уже приєдналася максимальна кількість людей. Попросіть нове.',forbidden:'Недостатньо прав для цієї дії.',network:'Не вдалося з\'єднатися із сервером. Перевірте інтернет і спробуйте ще раз.'};
 const ROLE_D={owner:'Керує дошкою, учасниками, доступом і налаштуваннями',editor:'Працює із задачами й підзадачами',viewer:'Переглядає вміст без змін'};
 const PR={high:'Високий',med:'Середній',low:'Низький'};
 const SUB_ST={todo:'Не розпочато',prog:'В роботі',done:'Виконано'};
@@ -716,7 +718,9 @@ const TPL={
  team:{n:'Ідеї · В роботі · На перевірці · Готово',s:[['Ідеї','idea'],['В роботі','prog'],['На перевірці','rev'],['Готово','done']]},
  mini:{n:'Треба зробити · Готово',s:[['Треба зробити','todo'],['Готово','done']]},
 };
-let seq=1000;const nid=p=>p+(seq++);
+let seq=1000;const nid=p=>window.ORVI_APP?p+Date.now().toString(36)+Math.random().toString(36).slice(2,8):p+(seq++);
+const BOT='orvi_task_bot';const joinUrl=code=>`t.me/${BOT}?start=${code}`;
+const ago=ts=>{const m=Math.round((Date.now()-ts)/60000);return m<1?'щойно':m<60?m+' хв тому':m<1440?Math.round(m/60)+' год тому':fShort.format(new Date(ts))};const when=c=>c.ts?ago(c.ts):(c.at||'');
 const mkStages=(id,arr)=>arr.map(([name,kind,icon,tint],i)=>({id:id+'_'+i,name,kind,icon:icon||null,tint:tint||''}));
 function board(id,type,name,icon,tint,desc,stages,o={}){return{id,type,name,icon,tint,desc,stages:mkStages(id,stages),fav:!!o.fav,archived:false,team:o.team||'',members:o.members||[{u:'me',r:'owner'}],pending:[],notif:defNotif(),links:{editor:mkLink(id,'ed'),viewer:mkLink(id,'vw'),owner:mkLink(id,'ow')}}}
 function defNotif(){return{on:true,digest:{on:false,time:'09:00',days:[1,2,3,4,5,6,0],scope:'today',skipEmpty:true},due:{when:'same',time:'09:00',timed:'1h'},ev:{assign:true,newTask:false,changes:true,comments:true,review:true,members:true}}}
@@ -1001,7 +1005,7 @@ function vTask(id){const t=getT(id);if(!t)return vGone();const b=getB(t.board);c
   ${t.subs.length&&sd===t.subs.length&&!done?`<div class="hint">Усі підзадачі виконано. Саму задачу закриває відповідальний окремо, коли результат готовий${b.type==='shared'?' і перевірений':''}.</div>`:''}
   <div class="hr"></div>
   <div class="subs-h">${ic('msg')}<h3>Коментарі</h3><span class="n">${t.comments.length}</span></div>
-  ${t.comments.map(c=>`<div class="cm">${av(c.u,'md')}<div><b>${esc(U[c.u].f)}</b> <small>${esc(c.at)}</small><p>${esc(c.t)}</p></div></div>`).join('')||'<p class="ro">Коментарів поки немає.</p>'}
+  ${t.comments.map(c=>`<div class="cm">${av(c.u,'md')}<div><b>${esc(U[c.u].f)}</b> <small>${esc(when(c))}</small><p>${esc(c.t)}</p></div></div>`).join('')||'<p class="ro">Коментарів поки немає.</p>'}
   <div style="height:8px"></div></div>
   ${edit?`<form class="composer" data-f="comment" data-id="${t.id}"><label class="ibtn" style="cursor:pointer" aria-label="Прикріпити файл">${ic('clip')}<input type="file" id="cfile-${t.id}" data-bind="file" data-id="${t.id}" hidden></label><input id="cm-${t.id}" placeholder="Додати коментар…" autocomplete="off" aria-label="Коментар"><button class="send" aria-label="Надіслати">${ic('send')}</button></form>`:''}</div>`}
 
@@ -1050,10 +1054,10 @@ function vSheet(){const sh=S.sheet;if(!sh)return'';const t=sh.id&&getT(sh.id);
   <button class="btn acc" data-a="createBoard">Створити дошку</button>`)}
  case 'join':{const r=sh.res;const inv=r&&r.ok?(INV.find(i=>i.link===r.code)||LINK_ONLY.find(i=>i.link===r.code)):null;
   return sheetWrap('Приєднатися за посиланням',`<p class="lede" style="margin:0">Вставте посилання-запрошення, яке вам надіслали в Telegram.</p>
-  <input class="inp" id="join-link" data-bind="sf" data-k="link" value="${esc(sh.link||'')}" placeholder="t.me/orvi_bot/app?startapp=join_…" autocomplete="off">
-  ${window.ORVI_APP?'':`<p class="lab">Приклади посилань для прев'ю</p>`}<div class="fv" ${window.ORVI_APP?'hidden':''}>${LINK_ONLY.map(i=>`<button class="vchip" data-a="sf" data-k="link" data-v="https://t.me/orvi_bot/app?startapp=${i.link}">${ic(ROLE_IC[i.role],'sm')}${ROLE[i.role]}</button>`).join('')}</div>
-  <button class="btn acc" data-a="checkLink">Перевірити посилання</button>
-  ${r&&!r.ok?`<p class="err">${r.msg}</p>`:''}
+  <input class="inp" id="join-link" data-bind="sf" data-k="link" value="${esc(sh.link||'')}" placeholder="t.me/${BOT}?start=join_…" autocomplete="off">
+  ${window.ORVI_APP?'':`<p class="lab">Приклади посилань для прев'ю</p>`}<div class="fv" ${window.ORVI_APP?'hidden':''}>${LINK_ONLY.map(i=>`<button class="vchip" data-a="sf" data-k="link" data-v="https://${joinUrl(i.link)}">${ic(ROLE_IC[i.role],'sm')}${ROLE[i.role]}</button>`).join('')}</div>
+  <button class="btn acc" data-a="checkLink" ${r&&r.busy?'disabled':''}>${r&&r.busy?'Перевіряємо…':'Перевірити посилання'}</button>
+  ${r&&r.ok===false?`<p class="err">${r.msg}</p>`:''}
   ${inv?`<div class="preview-card"><span class="tile ${inv.tint}">${ic(inv.icon)}</span><div style="flex:1"><b style="font-family:var(--f-display);font-weight:500;font-size:16px">${esc(inv.name)}</b><small style="display:block;color:var(--muted);font-size:12px;margin-top:2px">${esc(U[inv.from].f)} запрошує · ${pl(inv.people,W.mem)}</small></div></div>
    <div class="my-role static">${ic(ROLE_IC[inv.role])}<div><span>Ваша роль: <b>${ROLE[inv.role]}</b></span><small>${ROLE_CAN[inv.role]}</small></div></div>
    <p class="ro" style="margin:0">Посилання дійсне. Ви отримаєте доступ лише до цієї дошки.</p><button class="btn acc" data-a="acceptInv" data-id="${inv.id}">Приєднатися як ${ROLE_ACC[inv.role]}</button>`:''}
@@ -1084,7 +1088,7 @@ function vSheet(){const sh=S.sheet;if(!sh)return'';const t=sh.id&&getT(sh.id);
    <p class="lab">Запросити за @username</p>
    <form class="btn-row" data-f="inviteUser" data-id="${b.id}"><input class="inp" id="inv-u" placeholder="@username" autocomplete="off"><button class="btn acc" style="width:auto;padding:0 16px">Надіслати</button></form>${sh.err?`<p class="err">${sh.err}</p>`:''}
    ${last?`<p class="lab">Так ${esc(last.u)} побачить запрошення в Telegram</p><div class="tg-msg"><div class="tg-top">${logo(26)}<b>orvi. бот</b></div><p><b>${esc(U.me.n)}</b> запрошує вас приєднатися до дошки «${esc(b.name)}».</p><p class="tg-role">${ic(ROLE_IC[last.r],'sm')}Ваша роль: <b>${ROLE[last.r]}</b></p><p>${ROLE_CAN[last.r]}</p><div class="tg-btns"><span>Прийняти</span><span>Відхилити</span></div></div>`:''}
-   <p class="lab">Посилання для ролі «${ROLE[ir]}»</p><div class="linkbox"><code id="linkcode">t.me/orvi_bot/app?startapp=${b.links[ir]}</code><button data-a="copyLink">Скопіювати</button></div>
+   <p class="lab">Посилання для ролі «${ROLE[ir]}»</p><div class="linkbox"><code id="linkcode">${joinUrl(b.links[ir])}</code><button data-a="copyLink">Скопіювати</button></div>
    <p class="ro" style="margin:-4px 0 0">Хто відкриє це посилання, приєднається як ${ROLE_ACC[ir]}. Діє 7 днів, до 10 приєднань. <button style="color:var(--accent-text);font-weight:600" data-a="newLink" data-id="${b.id}" data-r="${ir}">Оновити посилання</button></p>
    <div class="note">${ic('shield','sm')}<span>Для кожної ролі своє посилання. Запрошення відкриває лише «${esc(b.name)}», а не інші ваші дошки.</span></div>`
    :`<div class="note">${ic(ROLE_IC[myRole(b)]||'eye','sm')}<span>Ваша роль: <b>${ROLE[myRole(b)]}</b>. ${ROLE_SELF[myRole(b)]} Запрошувати людей і змінювати ролі може лише власник.</span></div>`}
@@ -1105,7 +1109,7 @@ function vSheet(){const sh=S.sheet;if(!sh)return'';const t=sh.id&&getT(sh.id);
   <div class="btn-row"><div style="flex:1"><p class="lab" style="margin-bottom:8px">Виконавець</p><select class="inp" id="sw-${s.id}" data-bind="subWho" data-id="${t.id}" data-sub="${s.id}" ${dis}>${b.members.filter(m=>m.r!=='viewer').map(m=>`<option value="${m.u}" ${s.who===m.u?'selected':''}>${esc(U[m.u].n)}</option>`).join('')}</select></div>
    <div style="flex:1"><p class="lab" style="margin-bottom:8px">Термін</p><input class="inp" type="date" id="sd-${s.id}" data-bind="subDue" data-id="${t.id}" data-sub="${s.id}" value="${s.due||''}" ${dis}></div></div>
   <p class="lab">Деталі</p><textarea class="inp" id="sn-${s.id}" data-bind="subNote" data-id="${t.id}" data-sub="${s.id}" placeholder="Що саме треба зробити" ${edit?'':'readonly'}>${esc(s.note)}</textarea>
-  <p class="lab">Коментарі</p>${s.comments.map(c=>`<div class="cm">${av(c.u,'md')}<div><b>${esc(U[c.u].f)}</b> <small>${esc(c.at)}</small><p>${esc(c.t)}</p></div></div>`).join('')||'<p class="ro" style="margin:0">Поки порожньо.</p>'}
+  <p class="lab">Коментарі</p>${s.comments.map(c=>`<div class="cm">${av(c.u,'md')}<div><b>${esc(U[c.u].f)}</b> <small>${esc(when(c))}</small><p>${esc(c.t)}</p></div></div>`).join('')||'<p class="ro" style="margin:0">Поки порожньо.</p>'}
   ${edit?`<form class="btn-row" data-f="subComment" data-id="${t.id}" data-sub="${s.id}"><input class="inp" id="sc-${s.id}" placeholder="Коментар до підзадачі" autocomplete="off"><button class="send" aria-label="Надіслати">${ic('send')}</button></form>`:''}
   <div class="hint">Виконання підзадачі не закриває основну задачу. Її статус змінює відповідальний: ${esc(U[t.who].f)}.</div>
   ${edit?`<button class="opt danger" data-a="rmSub" data-id="${t.id}" data-sub="${s.id}">${ic('trash')}<div>Видалити підзадачу</div></button>`:''}`)}
@@ -1233,7 +1237,7 @@ function botMsgs(){const m=[{me:true,html:'/start'},{start:true,html:'Вітаю
  S.cancelled.slice(-2).forEach(c=>m.push({sys:true,html:esc(c)}));
  if(S.notif.invite&&INV[0])m.push({html:`<b>${esc(U[INV[0].from].f)}</b> запрошує вас до дошки «${esc(INV[0].name)}».<br>Ваша роль: <b>${ROLE[INV[0].role]}</b>. ${ROLE_CAN[INV[0].role]}`,btn:{l:'Переглянути',a:'botInv',id:INV[0].id}});
  return m}
-function renderBot(){document.getElementById('bot').innerHTML=`<div class="bot-card"><div class="bot-top">${logo(36)}<div><b>orvi. бот</b><small>@orvi_bot · Telegram</small></div></div>
+function renderBot(){document.getElementById('bot').innerHTML=`<div class="bot-card"><div class="bot-top">${logo(36)}<div><b>orvi. бот</b><small>@${BOT} · Telegram</small></div></div>
  <div class="bot-feed">${botMsgs().map(x=>x.sys?`<div class="msg sys">${x.html}</div>`:`<div class="msg ${x.me?'me':''}">${x.html}${x.btn?`<button class="mb" data-a="${x.btn.a}" data-id="${x.btn.id||''}" data-sub="${x.btn.sub||''}">${x.btn.l}</button>`:''}</div>`).join('')}</div></div>
  <p class="bot-note">Повідомлення бота будуються з поточних даних прототипу. Змініть термін, виконайте підзадачу чи вимкніть сповіщення в налаштуваннях, і стрічка оновиться. Кнопки ведуть у потрібну задачу.</p>`}
 
@@ -1313,14 +1317,23 @@ const A={
  checkLink:()=>{const sh=S.sheet;const v=(sh.link||'').trim();const m=v.match(/join_[a-z0-9]+_[a-z0-9]+/i);
   if(!v){sh.res={ok:false,msg:'Вставте посилання з повідомлення.'};return}
   if(!m){sh.res={ok:false,msg:'Це не схоже на запрошення orvi. Перевірте, чи скопійовано посилання повністю.'};return}
+  if(window.orviApi){sh.res={busy:true};orviApi.linkInfo(m[0]).then(r=>{if(S.sheet!==sh)return;
+   if(r.ok&&r.member)sh.res={ok:true,board:r.member};
+   else if(r.ok){const k=orviApi.userKey(r.from);const id='l_'+m[0];if(!LINK_ONLY.some(x=>x.id===id))LINK_ONLY.push({id,api:true,link:m[0],name:r.name,icon:r.icon||'folder',tint:r.tint||'',team:r.team,people:r.people,role:r.role,from:k});sh.res={ok:true,code:m[0]}}
+   else sh.res={ok:false,msg:LINK_ERR[r.error]||LINK_ERR.network};render()});return}
   const code=m[0];const used=LINK_ONLY.find(i=>i.link===code&&i.used);if(used){sh.res={ok:false,msg:'Ви вже приєдналися за цим посиланням.'};return}const inv=INV.find(i=>i.link===code)||LINK_ONLY.find(i=>i.link===code);const b=B.find(x=>live(x)&&Object.values(x.links).includes(code));
   if(inv)sh.res={ok:true,code};else if(b&&myRole(b))sh.res={ok:true,board:b.id};
   else sh.res={ok:false,msg:'Посилання недійсне або термін його дії минув. Попросіть надіслати нове.'}},
- acceptInv:d=>{const i=INV.find(x=>x.id===d.id)||LINK_ONLY.find(x=>x.id===d.id);LINK_ONLY.forEach(x=>{if(x.id===i.id)x.used=true});const id=nid('s');
+ acceptInv:d=>{const i=INV.find(x=>x.id===d.id)||LINK_ONLY.find(x=>x.id===d.id);
+  if(window.orviApi&&(i.api||i.inviteId)){const sh=S.sheet;if(sh)sh.busy=true;(i.api?orviApi.join(i.link):orviApi.respond(i.inviteId,true)).then(async r=>{
+    if(!r.ok){if(sh)sh.busy=false;toast(LINK_ERR[r.error]||LINK_ERR.network);render();return}
+    await orviApi.reload();S.sheet=null;S.tab='shared';S.stacks.shared=[];if(getB(r.board))push('board',r.board);
+    toast(r.already?'Ви вже учасник цієї дошки':`Ви приєдналися до «${i.name}» як ${ROLE_ACC[r.role||i.role]}`);render()});return false}LINK_ONLY.forEach(x=>{if(x.id===i.id)x.used=true});const id=nid('s');
   const b=board(id,'shared',i.name,i.icon,i.tint,'Спільна дошка команди.',TPL.team.s,{team:i.team,members:[{u:i.from,r:'owner'},{u:'me',r:i.role},{u:'anton',r:'editor'}]});B.unshift(b);S.joinedRole=i.role;
   tk(id,0,'Ідеї для кампанії',{d:6,who:i.from});tk(id,1,'Бюджет на рекламу',{d:3,who:i.from,subs:[['Зібрати ціни','me',2]]});
   if(INV.includes(i))INV.splice(INV.indexOf(i),1);S.sheet=null;S.tab='shared';S.stacks.shared=[];push('board',id);toast(`Ви приєдналися до «${i.name}» як ${ROLE_ACC[i.role]}`)},
- declineInv:d=>{INV.splice(INV.findIndex(x=>x.id===d.id),1);S.sheet=null;toast('Запрошення відхилено')},
+ declineInv:d=>{const i=INV.find(x=>x.id===d.id);if(window.orviApi&&i&&i.inviteId){orviApi.respond(i.inviteId,false).then(r=>{if(r.ok){INV.splice(INV.indexOf(i),1);S.sheet=null;toast('Запрошення відхилено')}else toast(LINK_ERR.network);render()});return false}
+  INV.splice(INV.findIndex(x=>x.id===d.id),1);S.sheet=null;toast('Запрошення відхилено')},
  renameBoard:d=>{const n=(S.sheet.name??'').trim();if(n)getB(d.id).name=n;S.sheet=null},
  archive:d=>{const b=getB(d.id);b.archived=!b.archived;S.sheet=null;toast(b.archived?'Дошку перенесено в архів':'Дошку повернуто');if(b.archived){const t=topE();if(t&&t.id===b.id)S.stacks[S.tab].pop()}},
  deleteBoard:d=>{const b=getB(d.id);if(!b)return;b.deletedAt=iso(TODAY);pruneStacks();S.sheet=null;
@@ -1329,12 +1342,16 @@ const A={
  restoreBoard:d=>{const b=getB(d.id);if(!b)return;b.deletedAt=null;b.archived=false;toast(`«${b.name}» відновлено`)},
  purgeBoard:d=>{const i=B.findIndex(b=>b.id===d.id);if(i<0)return;const name=B[i].name;B.splice(i,1);for(let k=T.length-1;k>=0;k--)if(T[k].board===d.id)T.splice(k,1);S.sheet=null;toast(`«${name}» видалено назавжди`)},
  emptyTrash:d=>{const ids=B.filter(b=>b.deletedAt&&b.type===d.bt).map(b=>b.id);ids.forEach(id=>A.purgeBoard({id}));S.sheet=null;toast(`Кошик очищено: ${pl(ids.length,['дошка','дошки','дощок'])}`)},
- leaveBoard:d=>{const b=getB(d.id);b.members=b.members.filter(m=>m.u!=='me');B.splice(B.indexOf(b),1);Object.keys(S.stacks).forEach(k=>S.stacks[k]=S.stacks[k].filter(e=>e.v==='settings'||(e.v==='board'?getB(e.id):getT(e.id))));S.sheet=null;toast('Ви вийшли з дошки')},
- newLink:d=>{const b=getB(d.id);b.links[d.r]=mkLink(b.id,{editor:'ed',viewer:'vw',owner:'ow'}[d.r]);toast(`Нове посилання для ролі «${ROLE[d.r]}». Старе більше не діє`)},
- cancelInvite:d=>{const b=getB(d.id);b.pending=b.pending.filter(x=>x.u!==d.u);if(S.sheet.lastSent&&S.sheet.lastSent.u===d.u)S.sheet.lastSent=null;toast(`Запрошення для ${d.u} скасовано`)},
+ leaveBoard:d=>{const b=getB(d.id);
+  if(window.orviApi){orviApi.leave(b.id).then(r=>{if(!r.ok){toast(r.error==='last_owner'?'Ви єдиний власник. Передайте роль власника іншому учаснику або видаліть дошку.':LINK_ERR.network);render();return}
+   orviApi.forget(b.id);B.splice(B.indexOf(b),1);for(let k=T.length-1;k>=0;k--)if(T[k].board===b.id)T.splice(k,1);pruneStacks();S.sheet=null;toast('Ви вийшли з дошки');render()});return false}b.members=b.members.filter(m=>m.u!=='me');B.splice(B.indexOf(b),1);Object.keys(S.stacks).forEach(k=>S.stacks[k]=S.stacks[k].filter(e=>e.v==='settings'||(e.v==='board'?getB(e.id):getT(e.id))));S.sheet=null;toast('Ви вийшли з дошки')},
+ newLink:d=>{const b=getB(d.id);
+  if(window.orviApi){orviApi.newLink(b.id,d.r).then(r=>{if(r.ok){b.links[d.r]=r.code;toast(`Нове посилання для ролі «${ROLE[d.r]}». Старе більше не діє`)}else toast(LINK_ERR.network);render()});return false}b.links[d.r]=mkLink(b.id,{editor:'ed',viewer:'vw',owner:'ow'}[d.r]);toast(`Нове посилання для ролі «${ROLE[d.r]}». Старе більше не діє`)},
+ cancelInvite:d=>{const b=getB(d.id);
+  if(window.orviApi){const x=b.pending.find(p=>p.u===d.u);if(!x)return;orviApi.cancelInvite(x.id).then(r=>{if(r.ok){b.pending=b.pending.filter(p=>p!==x);if(S.sheet&&S.sheet.lastSent&&S.sheet.lastSent.u===d.u)S.sheet.lastSent=null;toast(`Запрошення для ${d.u} скасовано`)}else toast(LINK_ERR.network);render()});return false}b.pending=b.pending.filter(x=>x.u!==d.u);if(S.sheet.lastSent&&S.sheet.lastSent.u===d.u)S.sheet.lastSent=null;toast(`Запрошення для ${d.u} скасовано`)},
  copyLink:()=>{const el=document.getElementById('linkcode');const txt='https://'+el.textContent;
   navigator.clipboard?.writeText(txt).then(()=>toast('Посилання скопійовано'),()=>{selectEl(el);toast('Виділено. Скопіюйте вручну')})??(selectEl(el),toast('Виділено. Скопіюйте вручну'));return false},
- copyTaskLink:d=>{const txt=`https://t.me/orvi_bot/app?startapp=task_${d.id}`;S.sheet=null;navigator.clipboard?.writeText(txt).then(()=>{toast('Посилання на задачу скопійовано');render()},()=>{toast(txt);render()})},
+ copyTaskLink:d=>{const txt=`https://t.me/${BOT}?start=task_${d.id}`;S.sheet=null;navigator.clipboard?.writeText(txt).then(()=>{toast('Посилання на задачу скопійовано');render()},()=>{toast(txt);render()})},
  rmTask:d=>{const t=getT(d.id);T.splice(T.indexOf(t),1);S.sheet=null;S.stacks[S.tab].pop();toast('Задачу видалено')},
  saveStage:d=>{const b=getB(d.id);const s=b.stages.find(x=>x.id===d.st);const n=(S.sheet.name??s.name).trim();if(n)s.name=n;if(S.sheet.kind)s.kind=S.sheet.kind;s.icon=S.sheet.icon||null;s.tint=S.sheet.tint??'';S.sheet=null},
  rmStage:d=>{const b=getB(d.id);const idx=b.stages.findIndex(x=>x.id===d.st);if(idx<0)return;const st=b.stages[idx];const sh=S.sheet||{};
@@ -1454,13 +1471,16 @@ document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;const
  case 'addTask':{const v=f.querySelector('input').value.trim();if(!v)return;const b=getB(d.id);const t={id:nid('t'),board:d.id,stage:d.st,title:v,desc:'',due:null,time:'',pr:'med',who:'me',people:[],labels:[],fav:false,subs:[],comments:[],files:[]};T.push(t);toast('Задачу додано');break}
  case 'quickAdd':{const v=val('qa-title');if(!v)return;T.push({id:nid('t'),board:d.id,stage:val('qa-stage'),title:v,desc:'',due:val('qa-due')||null,time:'',pr:'med',who:'me',people:[],labels:[],fav:false,subs:[],comments:[],files:[]});S.sheet=null;S.btab[d.id]='board';toast('Задачу додано');break}
  case 'addSub':{const v=val('addsub-'+d.id);if(!v)return;const t=getT(d.id);t.subs.push({id:nid('sub'),title:v,who:'me',due:null,st:'todo',note:'',comments:[]});break}
- case 'comment':{const v=val('cm-'+d.id);if(!v)return;getT(d.id).comments.push({u:'me',t:v,at:'щойно'});requestAnimationFrame(()=>{const s=$app.querySelector('.scroll');if(s)s.scrollTop=s.scrollHeight});break}
- case 'subComment':{const v=val('sc-'+d.sub);if(!v)return;getT(d.id).subs.find(s=>s.id===d.sub).comments.push({u:'me',t:v,at:'щойно'});break}
+ case 'comment':{const v=val('cm-'+d.id);if(!v)return;getT(d.id).comments.push({id:nid('c'),u:'me',t:v,ts:Date.now()});requestAnimationFrame(()=>{const s=$app.querySelector('.scroll');if(s)s.scrollTop=s.scrollHeight});break}
+ case 'subComment':{const v=val('sc-'+d.sub);if(!v)return;getT(d.id).subs.find(s=>s.id===d.sub).comments.push({id:nid('c'),u:'me',t:v,ts:Date.now()});break}
  case 'addLabel':{const v=val('lbl-in');if(!v)return;const t=getT(d.id);if(!t.labels.includes(v))t.labels.push(v);S.sheet=null;break}
  case 'addStage':{A.createStage(d);break}
  case 'inviteUser':{let v=val('inv-u');if(!v)return;if(!v.startsWith('@'))v='@'+v;if(!/^@[a-z0-9_]{4,32}$/i.test(v)){S.sheet.err='Username має містити від 4 символів: латиниця, цифри, _';break}
   {const b=getB(d.id);const r=S.sheet.invRole||'editor';
-   if(b.pending.some(x=>x.u.toLowerCase()===v.toLowerCase())||b.members.some(m=>U[m.u].un.toLowerCase()===v.toLowerCase())){S.sheet.err='Ця людина вже є на дошці або вже має запрошення';break}
+   if(b.pending.some(x=>x.u.toLowerCase()===v.toLowerCase())||b.members.some(m=>(U[m.u].un||'').toLowerCase()===v.toLowerCase())){S.sheet.err='Ця людина вже є на дошці або вже має запрошення';break}
+   if(window.orviApi){const sh=S.sheet;sh.err=null;sh.busy=true;const inp=document.getElementById('inv-u');orviApi.invite(b.id,v,r).then(res=>{sh.busy=false;
+     if(res.ok){b.pending.push(res.pending);sh.lastSent={u:res.pending.u,r};if(inp)inp.value='';toast(`Бот надіслав ${res.pending.u} запрошення: роль «${ROLE[r]}»`)}
+     else sh.err=INV_ERR[res.error]||LINK_ERR.network;render()});break}
    S.sheet.err=null;b.pending.push({u:v,r});S.sheet.lastSent={u:v,r};toast(`Бот надіслав ${v} запрошення: роль «${ROLE[r]}»`)}break}
  }render()});
 document.addEventListener('input',e=>{const el=e.target;const d=el.dataset;if(!d.bind)return;
@@ -1479,6 +1499,7 @@ document.addEventListener('change',e=>{const el=e.target;const d=el.dataset;if(!
  else if(d.bind==='bn'){const b=getB(d.id);const [a,k]=d.k.split('.');if(el.value)b.notif[a][k]=el.value}
  else if(d.bind==='quiet'){if(el.value)S.quiet[d.k]=el.value}
  else if(d.bind==='sf'&&d.k==='kind'&&S.sheet)S.sheet.kind=el.value;
+ else if(d.bind==='role'&&window.orviApi){const b=getB(d.id);const v=el.value;orviApi.setRole(b.id,d.u,v).then(r=>{if(r.ok){if(v==='remove'){b.members=b.members.filter(m=>m.u!==d.u);toast(`${U[d.u].f} більше не має доступу`)}else{b.members.find(m=>m.u===d.u).r=v;toast(`${U[d.u].f}: роль «${ROLE[v]}»`)}}else toast(LINK_ERR.network);render()});return}
  else if(d.bind==='role'){const b=getB(d.id);if(el.value==='remove'){b.members=b.members.filter(m=>m.u!==d.u);toast(`${U[d.u].f} більше не має доступу`)}else b.members.find(m=>m.u===d.u).r=el.value}
  else if(d.bind==='file'){const f=el.files&&el.files[0];if(f){const t=getT(d.id);const kb=f.size/1024;t.files.push({n:f.name,s:kb>1024?(kb/1024).toFixed(1).replace('.',',')+' МБ':Math.max(1,Math.round(kb))+' КБ'});S.filesOpen[d.id]=true;toast('Файл прикріплено')}}
  else return;render()});
@@ -1487,6 +1508,7 @@ try{const th=localStorage.getItem('orvi-theme');if(th)S.theme=th}catch(e){}
 applyTheme();render();
 document.querySelector('[data-a=openLib]').innerHTML=ic('shapes','sm')+'Бібліотека іконок · '+ICON_COUNT;
 </script>
+
 <style>
 /* Telegram Mini App mode: the app fills the whole screen, no demo frame or bot preview */
 html,body{height:100%;overflow:hidden}
