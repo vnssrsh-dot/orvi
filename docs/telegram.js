@@ -88,6 +88,7 @@
     for (const st_t of st.tasks) {
       const t = taskIn(Object.assign({}, st_t.data, { id: st_t.id, board: st_t.board }));
       t.subs = t.subs || []; t.comments = t.comments || []; t.files = t.files || []; t.labels = t.labels || []; t.people = t.people || [];
+      if (!t.who) t.who = 'me';
       T.push(t);
       base.t.set(t.id, canon(taskOut(t)));
     }
@@ -101,7 +102,11 @@
       S.flagged = new Set(p.flagged || []);
       applyTheme();
     }
-    base.prefs = canon(userPrefs());
+    base.prefs = canon(st.prefs || {});
+    // people who left a board can still be named in its tasks and comments
+    const known = k => { if (!U[k]) U[k] = { n: 'Колишній учасник', f: 'Колишній учасник', voc: '', un: '', c: 'sand' }; };
+    T.forEach(t => { known(t.who); (t.people || []).forEach(known); t.comments.forEach(c => known(c.u)); t.subs.forEach(x => { known(x.who); (x.comments || []).forEach(c => known(c.u)); }); });
+    B.forEach(b => b.members.forEach(m => known(m.u)));
     pruneStacks();
   }
 
@@ -132,14 +137,20 @@
     return empty ? null : { body, sent, prefs };
   }
 
-  let syncing = null, again = false, timer = null, offline = false;
+  let syncing = null, again = false, timer = null, offline = false, dead = false;
+  function expired() {
+    if (dead) return; dead = true;
+    screen(`<p class="lede" style="font-size:15px;max-width:30ch">Сесія застаріла. Закрийте застосунок і відкрийте його знову через бота, щоб зберегти зміни.</p>`);
+  }
   function schedule() { clearTimeout(timer); timer = setTimeout(flush, 700); }
   async function flush() {
+    if (dead) return;
     if (syncing) { again = true; return syncing; }
     const ch = changes();
     if (!ch) return;
     syncing = (async () => {
       const res = await call('sync', ch.body);
+      if (res.error === 'unauthorized') { expired(); return; }
       if (!res.ok) {
         if (!offline) { offline = true; toast(LINK_ERR.network); }
         setTimeout(flush, 5000);
@@ -170,7 +181,11 @@
         if (sentS && canon(taskOut(T[i])) === sentS && srv !== sentS) { T[i] = taskIn(JSON.parse(srv)); changedLocally = true; }
         base.t.set(st.id, srv);
       }
-      if ((res.errors || []).length) { toast(LINK_ERR[res.errors[0].error] || 'Частину змін не збережено'); await reload(); return; }
+      if ((res.errors || []).length) {
+        const e = res.errors[0].error;
+        toast(e === 'gone' ? 'Інший учасник щойно це видалив. Дані оновлено' : LINK_ERR[e] || 'Частину змін не збережено. Дані оновлено');
+        await reload(); return;
+      }
       if (changedLocally) baseRender();
     })();
     await syncing;
@@ -180,7 +195,8 @@
 
   async function reload(first) {
     if (!first) await flush();
-    const st = await call('state');
+    const st = await call(first ? 'state?boot=1' : 'state');
+    if (st.error === 'unauthorized' && !first) { expired(); return st; }
     if (!st.ok) return st;
     applyState(st, first);
     baseRender();
@@ -188,9 +204,10 @@
   }
 
   async function refresh() {
-    if (document.hidden || syncing || changes() || S.sheet) return;
+    if (dead || document.hidden || syncing || changes() || S.sheet) return;
     if ((typeof td !== 'undefined' && td) || (typeof drag !== 'undefined' && drag)) return;
     const st = await call('state');
+    if (st.error === 'unauthorized') { expired(); return; }
     if (!st.ok || syncing || changes() || S.sheet) return;
     applyState(st, false);
     baseRender();
@@ -209,6 +226,14 @@
     leave: async board => { await flush(); return call('leave', { board }); },
     forget: board => { base.b.delete(board); base.bp.delete(board); for (const [id, s] of base.t) if (JSON.parse(s).board === board) base.t.delete(id); },
     reload: () => reload(false),
+  };
+  window.orviReset = async function () {
+    await flush();
+    const r = await call('reset', {});
+    if (!r.ok) { toast(LINK_ERR.network); render(); return; }
+    Object.assign(S, { tab: 'home', stacks: { home: [], personal: [], shared: [] }, sheet: null, onbHidden: false, collapsed: {}, btab: {}, cancelled: [] });
+    await reload(true);
+    toast('Дані видалено. Почнімо спочатку');
   };
 
   /* ---------- start links from the bot ---------- */
@@ -256,6 +281,9 @@
     }
     const param = (tg.initDataUnsafe && tg.initDataUnsafe.start_param) || new URLSearchParams(location.search).get('startapp') || '';
     route(param);
+    if (!st.chatOk && tg.requestWriteAccess) {
+      try { tg.requestWriteAccess(granted => { if (granted) call('chatok', {}); }); } catch (e) {}
+    }
     document.documentElement.classList.add('orvi-ready');
     baseRender();
     setInterval(refresh, 15000);
