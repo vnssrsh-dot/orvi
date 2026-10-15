@@ -20,6 +20,9 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS links_board ON links(board_id)`,
   `CREATE TABLE IF NOT EXISTS sent (key TEXT PRIMARY KEY, at INTEGER)`,
   `CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)`,
+  `CREATE TABLE IF NOT EXISTS pending_changes (user_id INTEGER, task_id TEXT, board_id TEXT, actor_id INTEGER, actor TEXT, orig TEXT,
+     first_at INTEGER, send_after INTEGER, PRIMARY KEY (user_id, task_id))`,
+  `CREATE TABLE IF NOT EXISTS deleted_tasks (id TEXT PRIMARY KEY, board_id TEXT, at INTEGER)`,
   `CREATE TABLE IF NOT EXISTS presence (task_id TEXT, user_id INTEGER, field TEXT, until INTEGER, PRIMARY KEY (task_id, user_id))`,
 ];
 
@@ -113,6 +116,11 @@ async function consume(batch, env) {
   const lastByChat = new Map();
   for (const msg of batch.messages) {
     const body = msg.body;
+    if (body && body.type === 'change') {
+      const later = await flushChange(env, body.user, body.task);
+      if (later) msg.retry({ delaySeconds: later }); else msg.ack();
+      continue;
+    }
     const wait = CHAT_GAP - (Date.now() - (lastByChat.get(body.chat_id) || 0));
     if (wait > 0) await sleep(wait);
     const r = await deliver(env, body);
@@ -198,6 +206,7 @@ function cleanPrefs(p) {
     btab: Object.fromEntries(Object.entries(p.btab || {}).filter(([k]) => SAFE_ID.test(k)).slice(0, 500).map(([k, v]) => [k, oneOf(v, ['board', 'list', 'cal'], 'board')])),
     onbHidden: !!p.onbHidden, flagged: arr(p.flagged, 200).map(icon).filter(Boolean),
     tz: Number.isInteger(p.tz) && p.tz >= -720 && p.tz <= 840 ? p.tz : 120,
+    privacy: typeof p.privacy === 'string' && DATE.test(p.privacy) ? p.privacy : '', // accepted policy version
   };
 }
 const tt = s => esc(String(s || '').slice(0, 150));
@@ -359,7 +368,8 @@ async function sync(env, me, meUser, body) {
       if (!cur) {
         await env.DB.prepare('INSERT INTO tasks (id, board_id, data, version, updated_at) VALUES (?,?,?,1,?)').bind(it.id, boardId, S_(next), now()).run();
         out.tasks.push({ id: it.id, board: boardId, data: next });
-        notes.push({ kind: 'new', board: boardId, task: next, old: null });
+        const restored = await env.DB.prepare('DELETE FROM deleted_tasks WHERE id=?').bind(it.id).run();
+        if (!restored.meta.changes) notes.push({ kind: 'new', board: boardId, task: next, old: null }); // an undo brings it back quietly
         break;
       }
       const curData = parse(cur.data, {});
@@ -374,7 +384,10 @@ async function sync(env, me, meUser, body) {
     if (!cur) continue;
     const role = await roleOf(env, cur.board_id, me);
     if (!role || role === 'viewer') { out.errors.push({ id, error: 'forbidden' }); continue; }
-    await env.DB.prepare('DELETE FROM tasks WHERE id=?').bind(id).run();
+    await env.DB.batch([
+      env.DB.prepare('DELETE FROM tasks WHERE id=?').bind(id),
+      env.DB.prepare('INSERT OR REPLACE INTO deleted_tasks (id, board_id, at) VALUES (?,?,?)').bind(id, cur.board_id, now()),
+    ]);
   }
 
   for (const id of body.delBoards || []) {
@@ -405,14 +418,10 @@ async function sync(env, me, meUser, body) {
         await sendTo(env, m.user_id, `➕ Нова задача на дошці ${bName}: «${tt(t.title)}» · додає ${actor}`, open);
       continue;
     }
-    if (t.who && t.who !== me) {
-      const nk = st[t.stage] && st[t.stage].kind, okk = st[o.stage] && st[o.stage].kind;
-      if (t.stage !== o.stage && nk === 'rev' && await wants(env, t.who, n.board, 'review'))
-        await sendTo(env, t.who, `👁 <b>${actor}</b> передає на перевірку задачу «${tt(t.title)}» · ${bName}`, open);
-      else if ((t.stage !== o.stage || t.due !== o.due) && o.who === t.who && await wants(env, t.who, n.board, 'changes'))
-        await sendTo(env, t.who, `✏️ <b>${actor}</b> змінює ${t.due !== o.due ? `термін задачі «${tt(t.title)}»: ${t.due ? t.due.split('-').reverse().slice(0, 2).join('.') : 'без терміну'}` : `етап задачі «${tt(t.title)}» на «${esc((st[t.stage] || {}).name || '')}»`} · ${bName}`, open);
-      void okk;
-    }
+    // Stage and due-date changes are collected for a short while and sent as one net summary,
+    // so dragging a task back and forth does not flood the responsible person.
+    if (t.who && t.who !== me && o.who === t.who && (t.stage !== o.stage || t.due !== o.due))
+      await queueChange(env, t.who, t.id, n.board, me, nameOf(meUser), { stage: o.stage, due: o.due });
     const oldC = new Set((o.comments || []).map(keyOf));
     const fresh = (t.comments || []).filter(c => !oldC.has(keyOf(c)) && c.u === me);
     if (fresh.length) {
@@ -420,8 +429,62 @@ async function sync(env, me, meUser, body) {
       for (const u of to) if (await wants(env, u, n.board, 'comments'))
         await sendTo(env, u, `💬 <b>${actor}</b> у задачі «${tt(t.title)}»: ${esc(fresh[fresh.length - 1].t).slice(0, 300)}`, open);
     }
+    for (const sb of t.subs || []) {
+      const os = (o.subs || []).find(x => x.id === sb.id);
+      const oldS = new Set(((os && os.comments) || []).map(keyOf));
+      const freshS = (sb.comments || []).filter(c => !oldS.has(keyOf(c)) && c.u === me);
+      if (!freshS.length) continue;
+      const to = new Set([sb.who, t.who].filter(x => x && x !== me));
+      for (const u of to) if (await wants(env, u, n.board, 'comments'))
+        await sendTo(env, u, `💬 <b>${actor}</b> у підзадачі «${tt(sb.title)}» (задача «${tt(t.title)}»): ${esc(freshS[freshS.length - 1].t).slice(0, 300)}`, open);
+    }
   }
   return out;
+}
+
+/* ---------- debounced "task changed" notifications ---------- */
+const changeDelay = env => Math.max(1, Number(env.CHANGE_DELAY) || 45) * 1000; // quiet period after the last change
+const CHANGE_MAX = 5 * 60 * 1000;                                                // never hold a summary longer than this
+async function queueChange(env, userId, taskId, boardId, actorId, actorName, orig) {
+  const t = now();
+  const r = await env.DB.prepare(`INSERT INTO pending_changes (user_id, task_id, board_id, actor_id, actor, orig, first_at, send_after) VALUES (?,?,?,?,?,?,?,?)
+    ON CONFLICT(user_id, task_id) DO UPDATE SET actor_id=excluded.actor_id, actor=excluded.actor, send_after=excluded.send_after`)
+    .bind(userId, taskId, boardId, actorId, actorName, S_(orig), t, t + changeDelay(env)).run();
+  const fresh = await env.DB.prepare('SELECT first_at FROM pending_changes WHERE user_id=? AND task_id=?').bind(userId, taskId).first();
+  if (fresh && fresh.first_at === t && env.MSG_QUEUE) {
+    try { await env.MSG_QUEUE.send({ type: 'change', user: userId, task: taskId }, { delaySeconds: Math.ceil(changeDelay(env) / 1000) }); } catch (e) { /* the cron picks it up */ }
+  }
+  void r;
+}
+// Returns seconds to wait if the summary is not due yet, otherwise sends it (or nothing if there is no net change) and clears it.
+async function flushChange(env, userId, taskId, force) {
+  const p = await env.DB.prepare('SELECT * FROM pending_changes WHERE user_id=? AND task_id=?').bind(userId, taskId).first();
+  if (!p) return 0;
+  const t = now();
+  if (!force && p.send_after > t && t - p.first_at < CHANGE_MAX) return Math.ceil((p.send_after - t) / 1000);
+  await env.DB.prepare('DELETE FROM pending_changes WHERE user_id=? AND task_id=?').bind(userId, taskId).run();
+  const row = await env.DB.prepare('SELECT data FROM tasks WHERE id=?').bind(taskId).first();
+  const b = await env.DB.prepare('SELECT data FROM boards WHERE id=?').bind(p.board_id).first();
+  if (!row || !b) return 0;
+  const task = parse(row.data, {}), bd = parse(b.data, {}), orig = parse(p.orig, {});
+  if (bd.deletedAt || task.who !== userId || !(await roleOf(env, p.board_id, userId))) return 0;
+  const st = {}; (bd.stages || []).forEach(x => { st[x.id] = x; });
+  const fmt = d => d ? d.split('-').reverse().slice(0, 2).join('.') : 'без терміну';
+  const stageChanged = orig.stage !== task.stage, dueChanged = (orig.due || null) !== (task.due || null);
+  if (!stageChanged && !dueChanged) return 0; // moved back and forth: nothing to report
+  const open = { text: 'Відкрити задачу', start: 'task_' + taskId };
+  const bName = tt(bd.name || 'дошка'), actor = esc(p.actor);
+  const toRev = stageChanged && st[task.stage] && st[task.stage].kind === 'rev';
+  if (toRev && await wants(env, userId, p.board_id, 'review')) {
+    await sendTo(env, userId, `👁 <b>${actor}</b> передає на перевірку задачу «${tt(task.title)}» · ${bName}${dueChanged ? `\nТермін: ${fmt(orig.due)} → ${fmt(task.due)}` : ''}`, open);
+    return 0;
+  }
+  if (!(await wants(env, userId, p.board_id, 'changes'))) return 0;
+  const lines = [];
+  if (stageChanged) lines.push(`Етап: «${esc((st[orig.stage] || {}).name || '—')}» → «${esc((st[task.stage] || {}).name || '—')}»`);
+  if (dueChanged) lines.push(`Термін: ${fmt(orig.due)} → ${fmt(task.due)}`);
+  await sendTo(env, userId, `✏️ <b>${actor}</b> змінює задачу «${tt(task.title)}» · ${bName}\n${lines.join('\n')}`, open);
+  return 0;
 }
 
 /* ---------- membership & invitations ---------- */
@@ -474,6 +537,11 @@ async function api(req, env, path) {
   if (!user) return json({ ok: false, error: 'unauthorized' }, 401);
   const me = user.id;
   const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
+  const tzh = req.headers.get('x-tz'), tz = tzh === null || tzh === '' ? NaN : Number(tzh);
+  if (Number.isInteger(tz) && tz >= -720 && tz <= 840 && (path.startsWith('state') || path === 'sync')) {
+    // written only when it actually changed (travel, daylight saving)
+    await env.DB.prepare(`UPDATE users SET prefs=json_set(CASE WHEN json_valid(prefs) THEN prefs ELSE '{}' END, '$.tz', ?) WHERE id=? AND (json_extract(prefs, '$.tz') IS NOT ?)`).bind(tz, me, tz).run();
+  }
 
   if (path === 'state') {
     if (new URL(req.url).searchParams.get('boot')) {
@@ -494,7 +562,7 @@ async function api(req, env, path) {
       else await env.DB.prepare('DELETE FROM presence WHERE task_id=? AND user_id=?').bind(task, me).run();
       await env.DB.prepare('DELETE FROM presence WHERE until<?').bind(now() - 60000).run();
     }
-    const others = (await env.DB.prepare('SELECT user_id u, field FROM presence WHERE task_id=? AND user_id<>? AND until>?').bind(task, me, now()).all()).results;
+    const others = (await env.DB.prepare('SELECT p.user_id u, p.field, us.first_name, us.last_name, us.username FROM presence p LEFT JOIN users us ON us.id=p.user_id WHERE p.task_id=? AND p.user_id<>? AND p.until>?').bind(task, me, now()).all()).results;
     return json({ ok: true, others });
   }
   if (path === 'chatok') { await env.DB.prepare('UPDATE users SET chat_ok=1 WHERE id=?').bind(me).run(); return json({ ok: true }); }
@@ -636,6 +704,8 @@ async function once(env, key) {
 
 async function scheduled(env) {
   await init(env);
+  const due = (await env.DB.prepare('SELECT user_id, task_id FROM pending_changes WHERE send_after<=? OR first_at<=?').bind(now(), now() - CHANGE_MAX).all()).results;
+  for (const p of due) await flushChange(env, p.user_id, p.task_id, true);
   const users = (await env.DB.prepare('SELECT id, prefs FROM users WHERE chat_ok=1').all()).results;
   for (const u of users) {
     const prefs = parse(u.prefs, {});
@@ -682,17 +752,25 @@ async function scheduled(env) {
         }
       }
       if (g.due && n.due.timed !== 'off') {
+        // "N minutes before the task's time", also across midnight (a 00:30 task reminds at 23:30 the day before)
         const before = { '15m': 15, '1h': 60, '3h': 180 }[n.due.timed];
+        const toMin = s => { const [h, mm] = s.split(':').map(Number); return h * 60 + mm; };
+        const nowMin = toMin(nowHM);
         for (const x of items) {
-          if (!x.time || x.due !== today || !before) continue;
-          const target = addMin(x.time, -before);
-          if (minsBetween(target, x.time) > 0 && due(target) && await once(env, `tm:${u.id}:${x.id}:${x.due}:${x.time}:${n.due.timed}`))
-            await sendTo(env, u.id, `⏰ О ${x.time}: «${tt(x.title)}» · ${bName}`, { text: 'Відкрити задачу', start: 'task_' + x.task });
+          if (!x.time || !x.due || !before) continue;
+          const dueMin = dayDiff(today, x.due) * 1440 + toMin(x.time);
+          if (dueMin < 0 || dueMin > 1440 + 180) continue;
+          let target = dueMin - before;
+          if (target >= 0 && target < 1440) target = toMin(quietShift(addMin('00:00', target), prefs.quiet)); // quiet hours apply today
+          const late = nowMin - target;
+          if (late >= 0 && late < 30 && target < dueMin && await once(env, `tm:${u.id}:${x.id}:${x.due}:${x.time}:${n.due.timed}`))
+            await sendTo(env, u.id, `⏰ О ${x.time}${x.due !== today ? ' (завтра)' : ''}: «${tt(x.title)}» · ${bName}`, { text: 'Відкрити задачу', start: 'task_' + x.task });
         }
       }
     }
   }
   await env.DB.prepare('DELETE FROM sent WHERE at<?').bind(now() - 30 * 86400e3).run();
+  await env.DB.prepare('DELETE FROM deleted_tasks WHERE at<?').bind(now() - 7 * 86400e3).run();
   // boards kept in the trash for more than 14 days are deleted for good
   const limit = new Date(Date.now() - 14 * 86400e3).toISOString().slice(0, 10);
   const old = (await env.DB.prepare(`SELECT id, data FROM boards`).all()).results.filter(b => { const d = parse(b.data, {}).deletedAt; return d && d <= limit; });

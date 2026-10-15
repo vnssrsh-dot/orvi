@@ -1,0 +1,12 @@
+{
+  "name": "orvi-tests",
+  "private": true,
+  "description": "End-to-end and API tests for the orvi. Worker and Mini App",
+  "scripts": {
+    "test": "node run.js"
+  },
+  "devDependencies": {
+    "playwright-core": "1.56.1",
+    "wrangler": "3.114.17"
+  }
+}

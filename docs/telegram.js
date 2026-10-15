@@ -25,7 +25,7 @@
     try {
       const r = await fetch('/api/' + path, {
         method: body ? 'POST' : 'GET',
-        headers: { 'content-type': 'application/json', 'x-init-data': initData },
+        headers: { 'content-type': 'application/json', 'x-init-data': initData, 'x-tz': String(-new Date().getTimezoneOffset()) },
         body: body ? JSON.stringify(body) : undefined,
       });
       const j = await r.json().catch(() => ({ ok: false, error: 'network' }));
@@ -57,7 +57,7 @@
   const taskOut = t => mapUsers(clone(t), ID);
   const sharedOf = b => { const r = {}; SHARED.forEach(k => { if (k in b) r[k] = b[k]; }); if (!('deletedAt' in r)) r.deletedAt = null; return r; };
   const prefsOf = b => ({ fav: !!b.fav, notif: b.notif, archived: !!b.archived });
-  const userPrefs = () => ({ theme: S.theme, notif: S.notif, quiet: S.quiet, collapsed: S.collapsed, btab: S.btab, onbHidden: !!S.onbHidden, flagged: [...S.flagged], tz: -new Date().getTimezoneOffset() });
+  const userPrefs = () => ({ theme: S.theme, notif: S.notif, quiet: S.quiet, collapsed: S.collapsed, btab: S.btab, onbHidden: !!S.onbHidden, flagged: [...S.flagged], tz: -new Date().getTimezoneOffset(), privacy: S.privacy || '' });
 
   /* ---------- last synced copies (the "prev" side of each diff) ---------- */
   const base = { b: new Map(), bp: new Map(), t: new Map(), prefs: '' };
@@ -98,7 +98,7 @@
     }
     if (first) {
       const p = st.prefs || {};
-      ['theme', 'notif', 'quiet', 'collapsed', 'btab', 'onbHidden'].forEach(k => { if (p[k] !== undefined) S[k] = p[k]; });
+      ['theme', 'notif', 'quiet', 'collapsed', 'btab', 'onbHidden', 'privacy'].forEach(k => { if (p[k] !== undefined) S[k] = p[k]; });
       S.flagged = new Set(p.flagged || []);
       applyTheme();
     }
@@ -242,7 +242,11 @@
     },
   };
   let presTimer = null, lastPres = '', lastPresAt = 0;
-  function setOthers(task, others) { PRES.others[task] = (others || []).map(o => ({ u: K(o.u), field: o.field })); paintPresence(); }
+  function setOthers(task, others) {
+    // someone who joined after our last refresh is not in U yet: the server sends their name along
+    PRES.others[task] = (others || []).map(o => { const k = K(o.u); if (!U[k] || U[k].f === 'Колишній учасник') addUser({ id: o.u, first_name: o.first_name, last_name: o.last_name, username: o.username }); return { u: k, field: o.field }; });
+    paintPresence();
+  }
   function openTaskId() { const v = topE(); if (S.sheet && S.sheet.type === 'sub') return S.sheet.id; return v && v.v === 'task' ? v.id : null; }
   setInterval(async () => {
     if (dead || document.hidden) return;

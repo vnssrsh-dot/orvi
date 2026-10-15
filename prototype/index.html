@@ -227,6 +227,17 @@ input.mini-sel{font-variant-numeric:tabular-nums;padding:0 10px}
 .pdot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;margin-top:5px;animation:pdot 1.2s ease-in-out infinite}
 @keyframes pdot{50%{opacity:.25}}
 @media (prefers-reduced-motion:reduce){.pdot{animation:none}}
+.consent{position:absolute;inset:0;z-index:50;background:rgba(20,18,32,.55);display:flex;align-items:center;justify-content:center;padding:20px;animation:fade .2s}
+.consent-card{background:var(--bg);border-radius:24px;padding:24px 20px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;max-width:360px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.consent-card h2{font-size:22px}
+.consent-card p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink-2)}
+.pp-link{color:var(--accent-text);font-weight:600;font-size:13.5px;text-decoration:underline;text-underline-offset:3px;padding:4px}
+.consent.full{background:var(--bg);display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:0}
+.pp{margin-top:6px}
+.pp-h{font-family:var(--f-body);font-weight:700;font-size:14.5px;margin:18px 0 6px}
+.pp-p{margin:6px 0;font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+.pp-l{margin:4px 0 6px;padding-left:18px;font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+.pp-l li{margin:3px 0}
 .pg-btn{height:34px;padding:0 14px;border-radius:999px;background:var(--card);display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;box-shadow:var(--shadow)}
 .tile .i{width:24px;height:24px;stroke-width:1.5}
 .tile.big{width:72px;height:72px;border-radius:20px}
@@ -1024,6 +1035,37 @@ document.addEventListener('focusin',e=>{const f=presField(e.target);if(!f)return
 document.addEventListener('focusout',e=>{if(!presField(e.target))return;setTimeout(()=>{if(presField(document.activeElement))return;const was=PRES.mine;PRES.mine=null;paintPresence();if(window.orviApi&&was)orviApi.editing(null,was.task)},80)});
 if(!window.ORVI_APP)PRES.others.video=[{u:'anton',field:'desc'}]; // preview: Anton is editing the description
 
+/* ---------- privacy policy ---------- */
+const PRIVACY_VER='2026-10-15';
+function tzLabel(){const m=-new Date().getTimezoneOffset();const s=m<0?'−':'+';const a=Math.abs(m);return 'UTC'+s+Math.floor(a/60)+(a%60?':'+String(a%60).padStart(2,'0'):'')}
+function privacyText(){const P=(h,b)=>`<h2 class="pp-h">${h}</h2>${b}`;const L=a=>`<ul class="pp-l">${a.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+ return `<p class="pp-p">Редакція від 15 жовтня 2026 року. Ця політика пояснює, які дані збирає застосунок <b>orvi.</b> у Telegram (бот @${BOT}), навіщо вони потрібні та як ними керувати.</p>
+ ${P('1. Які дані ми отримуємо',`<p class="pp-p">Від Telegram, коли ви відкриваєте застосунок або пишете боту:</p>${L(['ідентифікатор акаунта Telegram;','імʼя, прізвище (якщо вказане) та @username;','дозвіл боту надсилати вам повідомлення.'])}
+  <p class="pp-p">Те, що ви створюєте самі:</p>${L(['дошки, етапи, задачі, підзадачі, описи, коментарі, мітки, терміни, пріоритети, іконки;','учасників дошок, їхні ролі, запрошення та посилання-запрошення;','ваші налаштування: тема, сповіщення, тихі години, обрані й архівні дошки.'])}
+  <p class="pp-p">Технічні дані:</p>${L(['ваш часовий пояс, щоб нагадування приходили за місцевим часом;','позначку «зараз редагує», коли ви змінюєте задачу (зберігається 20 секунд);','позначки про вже надіслані нагадування, щоб не надсилати їх повторно;','службові журнали сервера (час і результат запитів) для пошуку помилок.'])}
+  <p class="pp-p">Ми <b>не</b> отримуємо ваш номер телефону, контакти, геолокацію чи вміст інших чатів. Застосунок не приймає файлів і не використовує рекламних чи аналітичних трекерів.</p>`)}
+ ${P('2. Навіщо ці дані',L(['щоб показувати ваші дошки й задачі на будь-якому вашому пристрої;','щоб працювала спільна робота: учасники, ролі, запрошення за @username і посиланням;','щоб бот надсилав сповіщення та нагадування, які ви налаштували;','щоб захищати акаунти: кожен запит перевіряється підписом Telegram.']))}
+ ${P('3. Хто бачить ваші дані',L(['<b>Особисті дошки</b> бачите лише ви, доки самі не надасте доступ до конкретної дошки.','<b>Спільну дошку</b> бачать її учасники: її вміст, імена та @username учасників, а також хто що зараз редагує.','<b>Технічні партнери:</b> Cloudflare (сервер і база даних) та Telegram (доставка повідомлень бота). Вони обробляють дані лише для роботи сервісу.','Ми не продаємо й не передаємо ваші дані третім особам для реклами.']))}
+ ${P('4. Скільки ми зберігаємо',L(['дані акаунта та дошки — доки ви користуєтеся застосунком;','дошки в кошику — 14 днів, потім вони видаляються назавжди;','позначка «зараз редагує» — до 20 секунд;','позначки надісланих нагадувань — 30 днів, відомості про нещодавно видалені задачі (для скасування дії) — 7 днів;','службові журнали — відповідно до правил Cloudflare.']))}
+ ${P('5. Ваші права і керування даними',L(['змінювати й видаляти дошки, задачі та коментарі в будь-який момент;','вимкнути сповіщення повністю або для окремих дошок у налаштуваннях;','вийти зі спільної дошки або закрити доступ іншим учасникам, якщо ви власник;','видалити всі свої дані: «Налаштування → Дані → Почати спочатку». Дошки, де ви єдиний власник, буде видалено для всіх учасників;','заборонити боту писати вам, заблокувавши його в Telegram.']))}
+ ${P('6. Безпека',`<p class="pp-p">Дані передаються лише зашифрованим зʼєднанням (HTTPS). Сервер перевіряє, що кожен запит надійшов від вашого акаунта Telegram, і дозволяє змінювати дошку тільки відповідно до вашої ролі.</p>`)}
+ ${P('7. Діти',`<p class="pp-p">orvi. не призначений для дітей, молодших за вік, з якого Telegram дозволяє користуватися сервісом.</p>`)}
+ ${P('8. Зміни політики',`<p class="pp-p">Якщо ми суттєво змінимо політику, застосунок покаже нову редакцію й попросить прийняти її знову.</p>`)}
+ ${P('9. Звʼязок',`<p class="pp-p">З питань щодо даних пишіть боту <b>@${BOT}</b>.</p>`)}`}
+function vPrivacy(){return `<div class="screen"><div class="top"><button class="ibtn" data-a="back" aria-label="Назад">${ic('back')}</button><span class="spacer"></span></div>
+ <div class="scroll"><h1 class="h1">Політика конфіденційності</h1><div class="pp">${privacyText()}</div><button class="btn ghost" style="margin-top:18px" data-a="back">Назад</button></div></div>`}
+const consentNeeded=()=>window.ORVI_APP?(S.privacy!==PRIVACY_VER&&!S.loading):(S.mode==='empty'&&S.privacy!==PRIVACY_VER);
+function vConsent(){if(!consentNeeded())return'';
+ if(S.consentRead)return `<div class="consent full" role="dialog" aria-label="Політика конфіденційності"><div class="top"><button class="ibtn" data-a="consentBack" aria-label="Назад">${ic('back')}</button><span class="spacer"></span></div>
+  <div class="scroll"><h1 class="h1">Політика конфіденційності</h1><div class="pp">${privacyText()}</div><div class="btn-row" style="margin-top:18px"><button class="btn ghost" data-a="consentBack">Назад</button><button class="btn acc" data-a="acceptPrivacy">Приймаю</button></div></div></div>`;
+ return `<div class="consent" role="dialog" aria-modal="true" aria-label="Згода з політикою конфіденційності"><div class="consent-card">${logo(56)}
+  <h2>Ласкаво просимо до orvi.</h2>
+  <p>Щоб ваші дошки, задачі й нагадування працювали на всіх пристроях, orvi. зберігає імʼя та @username з Telegram і все, що ви створюєте в застосунку. Ми не продаємо дані й не показуємо рекламу.</p>
+  <button class="pp-link" data-a="consentRead">Прочитати політику конфіденційності</button>
+  <button class="btn acc" data-a="acceptPrivacy">Приймаю</button>
+  <button class="btn ghost" data-a="declinePrivacy">Не приймаю</button>
+  ${S.consentDeclined?`<p class="err" style="margin:0">Без згоди orvi. не може зберігати ваші дошки, тож користуватися застосунком не вийде. Ви можете повернутися будь-коли.</p>`:''}</div></div>`}
+
 function vSettings(){const n=S.notif;const sw=(k,l,d)=>`<button class="set-r" data-a="notif" data-k="${k}" role="switch" aria-checked="${n[k]}"><div>${l}${d?`<small>${d}</small>`:''}</div><span class="sw ${n[k]?'on':''}"></span></button>`;
  return `<div class="screen"><div class="top"><button class="ibtn" data-a="back" aria-label="Назад">${ic('back')}</button><span class="spacer"></span></div>
  <div class="scroll"><h1 class="h1">Налаштування</h1>
@@ -1031,6 +1073,7 @@ function vSettings(){const n=S.notif;const sw=(k,l,d)=>`<button class="set-r" da
   <p class="set-t">Тема оформлення</p><div class="set-g" style="padding:10px"><div class="seg">${[['system','Системна'],['light','Світла'],['dark','Темна']].map(([k,l])=>`<button class="${S.theme===k?'on':''}" data-a="theme" data-k="${k}">${l}</button>`).join('')}</div></div>
   <div class="set-g"><button class="set-r" data-a="sheet" data-s="iconLib"><span class="tile xs peach">${ic('shapes')}</span><div>Бібліотека іконок<small>${ICON_COUNT} іконок для дошок і задач</small></div>${ic('chevR','sm')}</button></div>
   <p class="set-t">Сповіщення в боті</p><div class="set-g">
+   <div class="set-r"><div>Часовий пояс<small>Визначається автоматично щоразу, коли ви користуєтеся orvi.</small></div><span class="role-tag">${tzLabel()}</span></div>
    ${sw('assign','Призначення задач і підзадач')}
    ${sw('due','Нагадування про терміни')}
 
@@ -1044,7 +1087,8 @@ function vSettings(){const n=S.notif;const sw=(k,l,d)=>`<button class="set-r" da
   ${window.ORVI_APP?`<p class="set-t">Дані</p><div class="set-g"><p class="prose" style="padding-bottom:4px">Ваші дошки й налаштування зберігаються на сервері orvi. і відкриваються на будь-якому пристрої, де ви користуєтеся цим акаунтом Telegram.</p><button class="set-r" data-a="sheet" data-s="resetData" style="color:var(--danger)">${ic('trash')}<div>Почати спочатку<small>Видалити ваші дошки, задачі й налаштування</small></div></button></div>`:''}
   <p class="set-t">Допомога</p><div class="set-g">
    ${[['boards','Дошки та етапи'],['subs','Підзадачі й відповідальні'],['roles','Запрошення та ролі']].map(([k,l])=>`<button class="set-r" data-a="sheet" data-s="help" data-k="${k}"><div>${l}</div>${ic('chevR','sm')}</button>`).join('')}</div>
-  <p class="lede" style="text-align:center;margin:24px 0 8px"><span class="wm" style="font-size:16px">orvi<b>.</b></span> · прототип 0.1</p></div></div>`}
+  <div class="set-g" style="margin-top:22px"><button class="set-r" data-a="push" data-v="privacy">${ic('shield')}<div>Політика конфіденційності<small>Які дані зберігає orvi. і навіщо</small></div>${ic('chevR','sm')}</button></div>
+  <p class="lede" style="text-align:center;margin:24px 0 8px"><span class="wm" style="font-size:16px">orvi<b>.</b></span>${window.ORVI_APP?'':' · прототип 0.1'}</p></div></div>`}
 
 function vGone(){return `<div class="screen"><div class="top"><button class="ibtn" data-a="back">${ic('back')}</button></div><div class="scroll"><div class="empty">Цей елемент видалено або доступ до нього закрито.</div></div></div>`}
 
@@ -1261,14 +1305,14 @@ const $app=document.getElementById('app');const mem={};let lastKey='';let lastSh
 const topE=()=>{const s=S.stacks[S.tab];return s[s.length-1]};
 const key=()=>{const t=topE();return S.tab+':'+(t?t.v+':'+(t.id||''):'root')};
 function screen(){const t=topE();if(!t)return S.tab==='home'?vHome():vBoards(S.tab);
- return t.v==='board'?vBoard(t.id):t.v==='task'?vTask(t.id):t.v==='settings'?vSettings():vGone()}
+ return t.v==='board'?vBoard(t.id):t.v==='task'?vTask(t.id):t.v==='settings'?vSettings():t.v==='privacy'?vPrivacy():vGone()}
 let pendingRender=false;
 function render(){if((td&&td.on)||drag){pendingRender=true;return}pendingRender=false;if(td){clearTimeout(td.timer);td=null}
  const sc=$app.querySelector('.scroll');if(sc)mem[lastKey]=sc.scrollTop;
  const shb=$app.querySelector('.sheet-body');const shTop=shb?shb.scrollTop:0;
  const ae=document.activeElement;const fid=ae&&ae.id&&$app.contains(ae)?ae.id:null;const sel=fid&&'selectionStart' in ae?[ae.selectionStart,ae.selectionEnd]:null;
  const k=key();
- $app.innerHTML=screen()+nav()+vSheet()+(S.toast?`<div class="toast" role="status"><span>${esc(S.toast)}</span>${S.undo?`<button data-a="undo">Скасувати</button>`:''}</div>`:'');
+ $app.innerHTML=screen()+nav()+vSheet()+vConsent()+(S.toast?`<div class="toast" role="status"><span>${esc(S.toast)}</span>${S.undo?`<button data-a="undo">Скасувати</button>`:''}</div>`:'');
  const n=$app.querySelector('.scroll');if(n)n.scrollTop=mem[k]||0;
  const sig=S.sheet?S.sheet.type+(S.sheet.id||''):'';const nb=$app.querySelector('.sheet-body');if(nb&&sig===lastSheet)nb.scrollTop=shTop;
  if(fid){const el=document.getElementById(fid);if(el){el.focus({preventScroll:true});if(sel&&el.setSelectionRange)try{el.setSelectionRange(sel[0],sel[1])}catch(e){}}}
@@ -1409,6 +1453,10 @@ const A={
  quietToggle:()=>{S.quiet.on=!S.quiet.on},
  hideOnb:()=>{S.onbHidden=true},
  resetData:()=>{window.orviReset&&window.orviReset();return false},
+ consentRead:()=>{S.consentRead=true},
+ consentBack:()=>{S.consentRead=false},
+ acceptPrivacy:()=>{S.privacy=PRIVACY_VER;S.consentRead=false;S.consentDeclined=false;try{localStorage.setItem('orvi-privacy',PRIVACY_VER)}catch(e){}},
+ declinePrivacy:()=>{S.consentDeclined=true;const tg=window.Telegram&&Telegram.WebApp;if(window.ORVI_APP&&tg&&tg.close)setTimeout(()=>tg.close(),1800)},
  stageSuggest:d=>{S.sheet.name=d.n;S.sheet.kind=d.k;S.sheet.err=null},
  createStage:d=>{const sh=S.sheet;const v=(sh.name||'').trim();if(!v){sh.err='Вкажіть назву етапу';return}const b=getB(d.id);b.stages.push({id:nid('st'),name:v,kind:sh.kind||'todo',icon:sh.icon||null,tint:sh.tint||''});S.sheet=null;toast('Етап додано')},
  botBoard:d=>{S.tab='home';S.stacks.home=[];S.sheet=null;push('board',d.id)},
@@ -1519,7 +1567,7 @@ document.addEventListener('change',e=>{const el=e.target;const d=el.dataset;if(!
  else if(d.bind==='file'){const f=el.files&&el.files[0];if(f){const t=getT(d.id);const kb=f.size/1024;t.files.push({n:f.name,s:kb>1024?(kb/1024).toFixed(1).replace('.',',')+' МБ':Math.max(1,Math.round(kb))+' КБ'});S.filesOpen[d.id]=true;toast('Файл прикріплено')}}
  else return;render()});
 
-try{const th=localStorage.getItem('orvi-theme');if(th)S.theme=th}catch(e){}
+try{const th=localStorage.getItem('orvi-theme');if(th)S.theme=th;if(!window.ORVI_APP)S.privacy=localStorage.getItem('orvi-privacy')||''}catch(e){}
 applyTheme();render();
 document.querySelector('[data-a=openLib]').innerHTML=ic('shapes','sm')+'Бібліотека іконок · '+ICON_COUNT;
 </script>
