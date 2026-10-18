@@ -20,6 +20,14 @@
     } catch (e) {}
   }
 
+  // On-screen keyboard: shrink the app to the visible area so a sheet's bottom button
+  // (e.g. «Додати етап») stays above the keyboard instead of hiding under it.
+  const vv = window.visualViewport;
+  if (vv) {
+    const fit = () => { document.documentElement.style.setProperty('--app-h', Math.round(vv.height) + 'px'); if (window.scrollY) window.scrollTo(0, 0); };
+    vv.addEventListener('resize', fit); fit();
+  }
+
   /* ---------- API ---------- */
   async function call(path, body) {
     try {

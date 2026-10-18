@@ -36,7 +36,12 @@ module.exports = async function () {
     console.log('App: board, stage, task, invite');
     await click(pa, '[data-a=tab][data-t=shared]'); await click(pa, '[data-a=tab][data-t=shared]');
     await click(pa, '.empty-st .btn'); await pa.fill('#nb-name', 'Команда'); await click(pa, '[data-a=createBoard]');
-    await click(pa, '.empty-st .btn'); await click(pa, '[data-a=stageSuggest][data-n=Плани]'); await click(pa, '[data-a=createStage]');
+    await click(pa, '.empty-st .btn'); await click(pa, '[data-a=createStage]');
+    ok(await pa.evaluate(() => S.sheet && S.sheet.err && document.activeElement.id === 'ns-name'), '«Додати етап» without a name explains why and focuses the field');
+    await pa.setViewportSize({ width: 390, height: 420 }); await sleep(300);
+    ok(await pa.evaluate(() => document.querySelector('[data-a=createStage]').getBoundingClientRect().bottom <= innerHeight), 'with the keyboard open the «Додати етап» button stays visible');
+    await click(pa, '[data-a=stageSuggest][data-n=Плани]'); await click(pa, '[data-a=createStage]'); await pa.setViewportSize({ width: 390, height: 800 });
+    ok(await pa.evaluate(() => getB(topE().id).stages.some(s => s.name === 'Плани')), '«Додати етап» adds the stage');
     await pa.fill('input[id^=add-]', 'Підготувати звіт'); await pa.press('input[id^=add-]', 'Enter'); await sleep(1500);
     ok(await pa.evaluate(() => T.some(t => t.title === 'Підготувати звіт') && document.activeElement.id.startsWith('add-')), 'Enter in the add field adds a task and keeps the field focused');
     ok(await pa.evaluate(() => getComputedStyle(document.querySelector('.add-row .add-go')).display === 'none'), 'the add arrow is hidden while the field is empty');

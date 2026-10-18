@@ -1460,7 +1460,7 @@ const A={
  acceptPrivacy:()=>{S.privacy=PRIVACY_VER;S.consentRead=false;S.consentDeclined=false;try{localStorage.setItem('orvi-privacy',PRIVACY_VER)}catch(e){}},
  declinePrivacy:()=>{S.consentDeclined=true;const tg=window.Telegram&&Telegram.WebApp;if(window.ORVI_APP&&tg&&tg.close)setTimeout(()=>tg.close(),1800)},
  stageSuggest:d=>{S.sheet.name=d.n;S.sheet.kind=d.k;S.sheet.err=null},
- createStage:d=>{const sh=S.sheet;const v=(sh.name||'').trim();if(!v){sh.err='Вкажіть назву етапу';return}const b=getB(d.id);b.stages.push({id:nid('st'),name:v,kind:sh.kind||'todo',icon:sh.icon||null,tint:sh.tint||''});S.sheet=null;toast('Етап додано')},
+ createStage:d=>{const sh=S.sheet;const inp=document.getElementById('ns-name');if(inp)sh.name=inp.value;const v=(sh.name||'').trim();if(!v){sh.err='Вкажіть назву етапу';toast(sh.err);requestAnimationFrame(()=>{const i=document.getElementById('ns-name');if(i){i.scrollIntoView({block:'center'});i.focus()}});return}const b=getB(d.id);b.stages.push({id:nid('st'),name:v,kind:sh.kind||'todo',icon:sh.icon||null,tint:sh.tint||''});S.sheet=null;toast('Етап додано')},
  botBoard:d=>{S.tab='home';S.stacks.home=[];S.sheet=null;push('board',d.id)},
  botHome:()=>{S.tab='home';S.stacks.home=[];S.sheet=null},
  botOpen:d=>{S.tab='home';S.stacks.home=[];S.sheet=null;push('task',d.id);if(d.sub)openSheet({type:'sub',id:d.id,sub:d.sub})},
