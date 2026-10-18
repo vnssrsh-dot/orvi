@@ -38,6 +38,11 @@ module.exports = async function () {
     await click(pa, '.empty-st .btn'); await pa.fill('#nb-name', 'Команда'); await click(pa, '[data-a=createBoard]');
     await click(pa, '.empty-st .btn'); await click(pa, '[data-a=stageSuggest][data-n=Плани]'); await click(pa, '[data-a=createStage]');
     await pa.fill('input[id^=add-]', 'Підготувати звіт'); await pa.press('input[id^=add-]', 'Enter'); await sleep(1500);
+    ok(await pa.evaluate(() => T.some(t => t.title === 'Підготувати звіт') && document.activeElement.id.startsWith('add-')), 'Enter in the add field adds a task and keeps the field focused');
+    ok(await pa.evaluate(() => getComputedStyle(document.querySelector('.add-row .add-go')).display === 'none'), 'the add arrow is hidden while the field is empty');
+    await pa.fill('input[id^=add-]', 'Чернетка'); await click(pa, '.add-row .add-go'); await sleep(300);
+    ok(await pa.evaluate(() => T.some(t => t.title === 'Чернетка') && document.activeElement.id.startsWith('add-')), 'the add arrow button adds a task too');
+    await pa.evaluate(() => { const i = T.findIndex(t => t.title === 'Чернетка'); T.splice(i, 1); render(); }); await sleep(1500);
     await click(pa, '[data-a=sheet][data-s=members]'); await pa.fill('#inv-u', B.username); await click(pa, 'form[data-f=inviteUser] .btn'); await sleep(800);
     ok(await pa.$eval('.sheet-body', x => /Очікує відповіді · роль: редактор/.test(x.innerText)), 'invite by @username shows as pending with the role');
     await settle();

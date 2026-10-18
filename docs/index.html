@@ -361,6 +361,8 @@ input.mini-sel{font-variant-numeric:tabular-nums;padding:0 10px}
 .st-word.prog{color:var(--accent-text)}
 .add-sub{display:flex;align-items:center;gap:12px;color:var(--muted);padding:6px 0}
 .add-sub input{flex:1;border:0;background:none;outline:none;min-width:0;color:var(--ink)}
+.add-go{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;flex:none;margin-right:-6px}
+.add-row input:placeholder-shown+.add-go,.add-sub input:placeholder-shown+.add-go{display:none}
 .hint{font-size:12px;color:var(--ink-2);background:var(--tile-sage);border-radius:var(--r-sm);padding:10px 12px;line-height:1.45;margin-top:8px}
 .cm{display:flex;gap:10px;padding:8px 0}
 .cm p{margin:2px 0 0;font-size:13.5px;line-height:1.45}
@@ -961,7 +963,7 @@ function vBoard(id){const b=getB(id);if(!b)return vGone();const tab=['board','li
   return `<section class="stage" data-id="${s.id}"><div class="st-h">${edit&&b.stages.length>1?`<span class="grip" data-drag="stage" role="button" tabindex="-1" aria-label="Перетягніть, щоб змінити порядок етапів" title="Перетягніть, щоб змінити порядок">${ic('grip')}</span>`:''}<button class="tgl" data-a="toggleStage" data-id="${s.id}" aria-expanded="${!c}">${stTile(s)}<h3>${esc(s.name)}</h3><span class="count grey">${list.length}</span><span class="chev ${c?'closed':''}">${ic('chevD')}</span></button>
    ${edit?`<button class="ibtn" data-a="sheet" data-s="stageMenu" data-id="${b.id}" data-st="${s.id}" aria-label="Дії з етапом">${ic('more')}</button>`:''}</div>
    ${c?'':`<div class="cards">${list.map(t=>tCard(t,b)).join('')}</div>
-   ${edit?`<form class="add-row" data-f="addTask" data-id="${b.id}" data-st="${s.id}">${ic('plus')}<input id="add-${s.id}" placeholder="Додати задачу" autocomplete="off" aria-label="Назва нової задачі в етапі ${esc(s.name)}"></form>`:''}`}</section>`}).join('')+'</div>'
+   ${edit?`<form class="add-row" data-f="addTask" data-id="${b.id}" data-st="${s.id}">${ic('plus')}<input id="add-${s.id}" placeholder="Додати задачу" autocomplete="off" enterkeyhint="done" aria-label="Назва нової задачі в етапі ${esc(s.name)}"><button class="add-go" aria-label="Додати задачу">${ic('arrow','sm')}</button></form>`:''}`}</section>`}).join('')+'</div>'
   +(edit&&b.stages.length>1?`<p class="ro" style="margin:10px 4px 0;display:flex;gap:6px;align-items:center">${ic('grip','sm')}Етап перетягуйте за ручку. Задачу утримайте й перенесіть в інше місце чи етап.</p>`:edit?`<p class="ro" style="margin:10px 4px 0">Утримайте задачу, щоб перенести її вище, нижче чи в інший етап.</p>`:'')
   +(edit?`<button class="add-stage" data-a="sheet" data-s="addStage" data-id="${b.id}">${ic('plus')}Додати етап</button>`:'')}
  else if(tab==='list'){const grp=[['Прострочено',t=>!isDone(t)&&t.due&&diff(t.due)<0],['Сьогодні',t=>!isDone(t)&&t.due&&diff(t.due)===0],['Цього тижня',t=>!isDone(t)&&t.due&&diff(t.due)>0&&diff(t.due)<=7],['Пізніше',t=>!isDone(t)&&t.due&&diff(t.due)>7],['Без терміну',t=>!isDone(t)&&!t.due],['Виконано',isDone]];
@@ -1016,13 +1018,13 @@ function vTask(id){const t=getT(id);if(!t)return vGone();const b=getB(t.board);c
   <div class="subs-h">${ic('subs')}<h3>Підзадачі</h3><span class="n">${sd}/${t.subs.length}</span></div>
   ${t.subs.map(s=>`<div class="sub"><button class="ck sq ${s.st==='done'?'on':s.st==='prog'?'half':''}" data-a="subCycle" data-id="${t.id}" data-sub="${s.id}" ${dis} aria-label="Статус: ${SUB_ST[s.st]}">${s.st==='done'?ic('check','sm'):''}</button>
     <button class="sub-main" data-a="sheet" data-s="sub" data-id="${t.id}" data-sub="${s.id}"><p class="${s.st==='done'?'done':''}">${esc(s.title)}</p><small>${s.st==='prog'?'<span class="st-word prog">В роботі</span>':''}${s.due?dueChip(s.due,'',s.st==='done'):''}${s.comments.length?`<span class="ind">${ic('msg','sm')}${s.comments.length}</span>`:''}</small></button>${av(s.who,'md')}</div>`).join('')}
-  ${edit?`<form class="add-sub" data-f="addSub" data-id="${t.id}">${ic('plus','sm')}<input id="addsub-${t.id}" placeholder="Додати підзадачу" autocomplete="off" aria-label="Нова підзадача"></form>`:''}
+  ${edit?`<form class="add-sub" data-f="addSub" data-id="${t.id}">${ic('plus','sm')}<input id="addsub-${t.id}" placeholder="Додати підзадачу" autocomplete="off" enterkeyhint="done" aria-label="Нова підзадача"><button class="add-go" aria-label="Додати підзадачу">${ic('arrow','sm')}</button></form>`:''}
   ${t.subs.length&&sd===t.subs.length&&!done?`<div class="hint">Усі підзадачі виконано. Саму задачу закриває відповідальний окремо, коли результат готовий${b.type==='shared'?' і перевірений':''}.</div>`:''}
   <div class="hr"></div>
   <div class="subs-h">${ic('msg')}<h3>Коментарі</h3><span class="n">${t.comments.length}</span></div>
   ${t.comments.map(c=>`<div class="cm">${av(c.u,'md')}<div><b>${esc(U[c.u].f)}</b> <small>${esc(when(c))}</small><p>${esc(c.t)}</p></div></div>`).join('')||'<p class="ro">Коментарів поки немає.</p>'}
   <div style="height:8px"></div></div>
-  ${edit?`<form class="composer" data-f="comment" data-id="${t.id}"><input id="cm-${t.id}" placeholder="Додати коментар…" autocomplete="off" aria-label="Коментар"><button class="send" aria-label="Надіслати">${ic('send')}</button></form>`:''}</div>`}
+  ${edit?`<form class="composer" data-f="comment" data-id="${t.id}"><input id="cm-${t.id}" placeholder="Додати коментар…" autocomplete="off" enterkeyhint="send" aria-label="Коментар"><button class="send" aria-label="Надіслати">${ic('send')}</button></form>`:''}</div>`}
 
 /* ---------- "someone is editing" banner ---------- */
 // others: [{u: userKey, field}]; field = title | desc | sub:<id>:title | sub:<id>:note
@@ -1147,7 +1149,7 @@ function vSheet(){const sh=S.sheet;if(!sh)return'';const t=sh.id&&getT(sh.id);
    <p class="ro" style="margin:-4px 0 0">${ROLE_D[ir]}. Роль діє і для запрошення за @username, і для посилання нижче.</p>
    ${ir==='owner'?`<div class="note" style="margin:0">${ic('alert','sm')}<span>Власник зможе видаляти учасників, змінювати ролі й видалити дошку. Запрошуйте так лише тих, кому довіряєте.</span></div>`:''}
    <p class="lab">Запросити за @username</p>
-   <form class="btn-row" data-f="inviteUser" data-id="${b.id}"><input class="inp" id="inv-u" placeholder="@username" autocomplete="off"><button class="btn acc" style="width:auto;padding:0 16px">Надіслати</button></form>${sh.err?`<p class="err">${sh.err}</p>`:''}
+   <form class="btn-row" data-f="inviteUser" data-id="${b.id}"><input class="inp" id="inv-u" placeholder="@username" autocomplete="off" enterkeyhint="send"><button class="btn acc" style="width:auto;padding:0 16px">Надіслати</button></form>${sh.err?`<p class="err">${sh.err}</p>`:''}
    ${last?`<p class="lab">Так ${esc(last.u)} побачить запрошення в Telegram</p><div class="tg-msg"><div class="tg-top">${logo(26)}<b>orvi. бот</b></div><p><b>${esc(U.me.n)}</b> запрошує вас приєднатися до дошки «${esc(b.name)}».</p><p class="tg-role">${ic(ROLE_IC[last.r],'sm')}Ваша роль: <b>${ROLE[last.r]}</b></p><p>${ROLE_CAN[last.r]}</p><div class="tg-btns"><span>Прийняти</span><span>Відхилити</span></div></div>`:''}
    <p class="lab">Посилання для ролі «${ROLE[ir]}»</p><div class="linkbox"><code id="linkcode">${joinUrl(b.links[ir])}</code><button data-a="copyLink">Скопіювати</button></div>
    <p class="ro" style="margin:-4px 0 0">Хто відкриє це посилання, приєднається як ${ROLE_ACC[ir]}. Діє 7 днів, до 10 приєднань. <button style="color:var(--accent-text);font-weight:600" data-a="newLink" data-id="${b.id}" data-r="${ir}">Оновити посилання</button></p>
@@ -1161,7 +1163,7 @@ function vSheet(){const sh=S.sheet;if(!sh)return'';const t=sh.id&&getT(sh.id);
   return sheetWrap('Відповідальний',b.members.filter(m=>m.r!=='viewer').map(m=>`<button class="opt ${t.who===m.u?'on':''}" data-a="setWho" data-id="${t.id}" data-v="${m.u}">${av(m.u,'md')}<div>${esc(U[m.u].n)}<small>${ROLE[m.r]}</small></div>${t.who===m.u?`<span class="ok">${ic('check')}</span>`:''}</button>`).join('')+`<p class="ro" style="margin:0">Відповідальний отримує результат і закриває задачу. Виконавців підзадач можна обрати окремо.</p>`)}
  case 'people':{if(!t)return'';const b=getB(t.board);
   return sheetWrap('Співучасники',b.members.filter(m=>m.u!==t.who).map(m=>{const on=t.people.includes(m.u);return `<button class="opt ${on?'on':''}" data-a="togglePerson" data-id="${t.id}" data-v="${m.u}">${av(m.u,'md')}<div>${esc(U[m.u].n)}</div>${on?`<span class="ok">${ic('check')}</span>`:''}</button>`}).join('')+`<button class="btn acc" data-a="close">Готово</button>`)}
- case 'label':return t?sheetWrap('Нова мітка',`<form data-f="addLabel" data-id="${t.id}" style="display:grid;gap:12px"><input class="inp" id="lbl-in" placeholder="Наприклад, Відео" autocomplete="off"><div class="fv">${['Терміново','Відео','SMM','Тексти','Дизайн'].filter(l=>!t.labels.includes(l)).map(l=>`<button type="button" class="vchip" data-a="addLabelQuick" data-id="${t.id}" data-v="${l}">${l}</button>`).join('')}</div><button class="btn acc">Додати</button></form>
+ case 'label':return t?sheetWrap('Нова мітка',`<form data-f="addLabel" data-id="${t.id}" style="display:grid;gap:12px"><input class="inp" id="lbl-in" placeholder="Наприклад, Відео" autocomplete="off" enterkeyhint="done"><div class="fv">${['Терміново','Відео','SMM','Тексти','Дизайн'].filter(l=>!t.labels.includes(l)).map(l=>`<button type="button" class="vchip" data-a="addLabelQuick" data-id="${t.id}" data-v="${l}">${l}</button>`).join('')}</div><button class="btn acc">Додати</button></form>
   ${t.labels.length?`<p class="lab">Додані</p><div class="fv">${t.labels.map(l=>`<button class="vchip" data-a="rmLabel" data-id="${t.id}" data-v="${esc(l)}">${esc(l)}<span class="x">${ic('x','sm')}</span></button>`).join('')}</div>`:''}`):'';
  case 'sub':{if(!t)return'';const s=t.subs.find(x=>x.id===sh.sub);if(!s)return'';const b=getB(t.board);const edit=canEdit(b);const dis=edit?'':'disabled';
   return sheetWrap('Підзадача',`<div class="presence" data-task="${t.id}" aria-live="polite">${presenceFor(t.id)}</div><button class="crumb" style="margin:0;justify-self:start;align-self:flex-start" data-a="close">${tile(b,'xs')}${esc(b.name)} · «${esc(t.title)}»</button>
@@ -1171,11 +1173,11 @@ function vSheet(){const sh=S.sheet;if(!sh)return'';const t=sh.id&&getT(sh.id);
    <div style="flex:1"><p class="lab" style="margin-bottom:8px">Термін</p><input class="inp" type="date" id="sd-${s.id}" data-bind="subDue" data-id="${t.id}" data-sub="${s.id}" value="${s.due||''}" ${dis}></div></div>
   <p class="lab">Деталі</p><textarea class="inp" id="sn-${s.id}" data-bind="subNote" data-id="${t.id}" data-sub="${s.id}" placeholder="Що саме треба зробити" ${edit?'':'readonly'}>${esc(s.note)}</textarea>
   <p class="lab">Коментарі</p>${s.comments.map(c=>`<div class="cm">${av(c.u,'md')}<div><b>${esc(U[c.u].f)}</b> <small>${esc(when(c))}</small><p>${esc(c.t)}</p></div></div>`).join('')||'<p class="ro" style="margin:0">Поки порожньо.</p>'}
-  ${edit?`<form class="btn-row" data-f="subComment" data-id="${t.id}" data-sub="${s.id}"><input class="inp" id="sc-${s.id}" placeholder="Коментар до підзадачі" autocomplete="off"><button class="send" aria-label="Надіслати">${ic('send')}</button></form>`:''}
+  ${edit?`<form class="btn-row" data-f="subComment" data-id="${t.id}" data-sub="${s.id}"><input class="inp" id="sc-${s.id}" placeholder="Коментар до підзадачі" autocomplete="off" enterkeyhint="send"><button class="send" aria-label="Надіслати">${ic('send')}</button></form>`:''}
   <div class="hint">Виконання підзадачі не закриває основну задачу. Її статус змінює відповідальний: ${esc(U[t.who].f)}.</div>
   ${edit?`<button class="opt danger" data-a="rmSub" data-id="${t.id}" data-sub="${s.id}">${ic('trash')}<div>Видалити підзадачу</div></button>`:''}`)}
  case 'quickAdd':{const b=getB(sh.id);if(!b)return'';
-  return sheetWrap('Нова задача',`<form data-f="quickAdd" data-id="${b.id}" style="display:grid;gap:12px"><input class="inp" id="qa-title" placeholder="Що треба зробити?" autocomplete="off">
+  return sheetWrap('Нова задача',`<form data-f="quickAdd" data-id="${b.id}" style="display:grid;gap:12px"><input class="inp" id="qa-title" placeholder="Що треба зробити?" autocomplete="off" enterkeyhint="done">
   <p class="lab">Етап</p><select class="inp" id="qa-stage">${b.stages.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select>
   <p class="lab">Термін</p><input class="inp" type="date" id="qa-due"><button class="btn acc">Додати задачу</button></form>`)}
  case 'stageMenu':{const b=getB(sh.id);const s=b&&b.stages.find(x=>x.id===sh.st);if(!s)return'';const n=T.filter(t=>t.stage===s.id).length;if(sh.icon===undefined){sh.icon=s.icon||'';sh.tint=s.tint||''}
@@ -1194,7 +1196,7 @@ function vSheet(){const sh=S.sheet;if(!sh)return'';const t=sh.id&&getT(sh.id);
   <button class="btn acc" data-a="saveStage" data-id="${b.id}" data-st="${s.id}">Зберегти</button>
   <button class="opt danger" data-a="sf" data-k="confirm" data-v="1">${ic('trash')}<div>Видалити етап<small>${n?pl(n,W.task)+': перенесіть або видаліть разом з етапом':'Етап порожній'}</small></div></button>`)}
  case 'addStage':{const b=getB(sh.id);if(!b)return'';const kind=sh.kind||'todo';if(sh.icon===undefined){sh.icon='';sh.tint=''}
-  return sheetWrap('Новий етап',`<p class="lab">Назва</p><form data-f="addStage" data-id="${b.id}"><input class="inp" id="ns-name" data-bind="sf" data-k="name" value="${esc(sh.name||'')}" placeholder="Наприклад, Мамі або На погодженні" autocomplete="off"></form>${sh.err?`<p class="err">${sh.err}</p>`:''}
+  return sheetWrap('Новий етап',`<p class="lab">Назва</p><form data-f="addStage" data-id="${b.id}"><input class="inp" id="ns-name" data-bind="sf" data-k="name" value="${esc(sh.name||'')}" placeholder="Наприклад, Мамі або На погодженні" autocomplete="off" enterkeyhint="done"></form>${sh.err?`<p class="err">${sh.err}</p>`:''}
   <div class="fv">${[['Ідеї','idea'],['Плани','todo'],['В роботі','prog'],['На перевірці','rev'],['Готово','done']].filter(([n])=>!b.stages.some(x=>x.name===n)).map(([n,k])=>`<button class="vchip" data-a="stageSuggest" data-n="${n}" data-k="${k}">${n}</button>`).join('')}</div>
   <p class="lab">Тип етапу</p><select class="inp" id="ns-kind" data-bind="sf" data-k="kind">${[['todo','Заплановано'],['idea','Ідеї'],['prog','В роботі'],['rev','На перевірці'],['done','Готово']].map(([k,l])=>`<option value="${k}" ${kind===k?'selected':''}>${l}</option>`).join('')}</select><p class="ro" style="margin:-4px 0 0">Тип визначає статус задач. Задачі, позначені галочкою, переходять в етап типу «Готово».</p>
   ${stageIconBlock(sh,kind)}
@@ -1529,8 +1531,11 @@ function selectEl(el){const r=document.createRange();r.selectNodeContents(el);co
 document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el)return;const fn=A[el.dataset.a];if(!fn)return;
  if(el.disabled)return;if(el.dataset.a==='closeScrim'&&e.target!==el)return;e.preventDefault();e.stopPropagation();if(fn(el.dataset,el,e)===false)return;render()});
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-a]')){e.preventDefault();e.target.click()}
+ if(e.key==='Enter'&&!e.isComposing&&e.target.matches('form[data-f] input')){e.preventDefault();e.target.form.requestSubmit();return}
  if(e.key==='Escape'&&(td||drag)){abortDrags();return}
  if(e.key==='Escape'&&S.sheet){S.sheet=null;render()}});
+// Tapping the add arrow keeps focus (and the keyboard) in the field, so several items can be added in a row.
+document.addEventListener('pointerdown',e=>{if(e.target.closest('.add-go'))e.preventDefault()});
 document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;const d=f.dataset;const val=id=>(document.getElementById(id)?.value||'').trim();
  switch(d.f){
  case 'addTask':{const v=f.querySelector('input').value.trim();if(!v)return;const b=getB(d.id);const t={id:nid('t'),board:d.id,stage:d.st,title:v,desc:'',due:null,time:'',pr:'med',who:'me',people:[],labels:[],fav:false,subs:[],comments:[],files:[]};T.push(t);toast('Задачу додано');break}
