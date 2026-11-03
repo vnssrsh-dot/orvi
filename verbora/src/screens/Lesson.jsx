@@ -4,7 +4,7 @@ import { loc } from '../lib/loc.js';
 import { haptic } from '../lib/telegram.js';
 import { speak, stop } from '../lib/tts.js';
 import { EXERCISES } from '../exercises/index.jsx';
-import { Mascot, Icon, Bar, Speak, Sheet, Confetti } from '../components.jsx';
+import { Mascot, Icon, Bar, Speak, Sheet, Confetti, Tile } from '../components.jsx';
 import { badgeById } from '../lib/badges.js';
 import { LEVELS } from '../lib/content.js';
 
@@ -154,7 +154,7 @@ export default function Lesson({ mode, unit, lesson, recap, exercises: given, ti
       <div className="row between" style={{ minHeight: 24 }}>
         <span className="small" style={{ fontWeight: 700 }}>{title}</span>
         {phaseLabel && <span className="pill">{phaseLabel}</span>}
-        {!phaseLabel && run >= 3 && <span className="pill">🔥 {run}</span>}
+        {!phaseLabel && run >= 3 && <span className="pill" style={{ background: 'var(--warn-soft)', color: 'var(--warn)' }}><span className="ic"><Icon name="flame" size={15} /></span>{run}</span>}
       </div>
 
       <div key={pos} className="col grow" style={{ gap: 14, animation: 'screenIn .25s ease both', paddingBottom: 150 }}>
@@ -166,7 +166,7 @@ export default function Lesson({ mode, unit, lesson, recap, exercises: given, ti
           return (
             <>
               <div className="row" style={{ alignItems: 'flex-end', justifyContent: 'flex-end', marginBottom: -8, marginTop: -6 }}>
-                <Mascot emotion={emotion} size={72} anim={feedback && !feedback.ok ? 'shake' : 'pop'} />
+                <Mascot emotion={feedback ? 'idle' : emotion} size={72} anim="pop" />
               </div>
               <C key={`${pos}-${step.ex.id}`} ex={step.ex} lang={lang} t={t} locked={Boolean(feedback)} sound={sound} onChange={onChange} />
             </>
@@ -176,7 +176,7 @@ export default function Lesson({ mode, unit, lesson, recap, exercises: given, ti
 
       {/* footer */}
       <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 30, display: 'flex', justifyContent: 'center' }}>
-        <div style={{ width: '100%', maxWidth: 480, padding: '12px 16px calc(16px + var(--safe-b))', background: feedback ? (feedback.ok ? 'var(--ok-soft)' : 'var(--bad-soft)') : 'linear-gradient(transparent, var(--bg) 30%)', borderRadius: feedback ? '22px 22px 0 0' : 0, transition: 'background .2s' }}>
+        <div style={{ width: '100%', maxWidth: 480, padding: feedback ? 0 : '12px 16px calc(16px + var(--safe-b))', background: feedback ? 'transparent' : 'linear-gradient(transparent, var(--bg) 30%)' }}>
           {step?.kind === 'recapIntro' && (
             <div className="row">
               <button className="btn line" onClick={skipRecap}>{t('recapRemember')}</button>
@@ -190,18 +190,22 @@ export default function Lesson({ mode, unit, lesson, recap, exercises: given, ti
               : <button className="btn" disabled={!ctl.ready} onClick={doCheck}>{t('check')}</button>
           )}
           {feedback && step?.kind === 'ex' && (
-            <div className="col" style={{ gap: 10, animation: 'up .2s ease' }}>
-              <div className="row" style={{ alignItems: 'flex-start' }}>
-                <span style={{ fontSize: 26 }}>{feedback.ok ? '✅' : '💜'}</span>
-                <div className="col" style={{ gap: 4, flex: 1 }}>
-                  <b style={{ color: feedback.ok ? 'var(--ok)' : 'var(--bad)', fontSize: 18 }}>{feedback.ok ? t('correct') : t('wrong')}</b>
+            <div className={`fb ${feedback.ok ? 'fb-ok' : 'fb-bad'}`}>
+              <div className="row" style={{ alignItems: 'flex-start', gap: 12 }}>
+                <span className="fb-icon"><Icon name={feedback.ok ? 'check' : 'close'} size={22} stroke={3} /></span>
+                <div className="col grow" style={{ gap: 6, minWidth: 0 }}>
+                  <div className="fb-title">{feedback.ok ? t('correct') : t('wrong')}</div>
                   {!feedback.ok && feedback.answer && (
-                    <div className="small"><b>{t('rightAnswer')}</b> <span className="en" style={{ color: 'var(--text)' }}>{feedback.answer}</span></div>
+                    <div className="fb-answer">
+                      <span className="tiny">{t('rightAnswer')}</span>
+                      <span className="en">{feedback.answer}</span>
+                    </div>
                   )}
                   {(!feedback.ok || step.ex.type === 'ipa') && step.ex.explain && <div className="small">{loc(step.ex.explain, lang)}</div>}
                 </div>
+                <Mascot emotion={emotion} size={64} anim={feedback.ok ? 'bounce' : 'shake'} />
               </div>
-              <button className={`btn ${feedback.ok ? 'ok' : 'bad'}`} onClick={next}>{t('next')} <Icon name="arrow" size={18} /></button>
+              <button className="btn" onClick={next}>{t('next')} <Icon name="arrow" size={18} /></button>
             </div>
           )}
         </div>
@@ -223,7 +227,7 @@ export function RuleCard({ rule, compare, t, lang, sound }) {
     <>
       <div className="row" style={{ alignItems: 'center' }}>
         <div className="col grow" style={{ gap: 4 }}>
-          <span className="pill" style={{ alignSelf: 'flex-start' }}>📘 {t('ruleTitle')}</span>
+          <span className="pill" style={{ alignSelf: 'flex-start' }}><span className="ic"><Icon name="book" size={15} /></span>{t('ruleTitle')}</span>
         </div>
         <Mascot emotion="explaining" size={96} />
       </div>
@@ -247,7 +251,7 @@ export function RuleCard({ rule, compare, t, lang, sound }) {
       )}
       {compare && (
         <div className="card soft col" style={{ gap: 6 }}>
-          <b>🇺🇦 ↔ 🇬🇧 {t('compareTitle')}</b>
+          <b className="row" style={{ gap: 8 }}><Tile icon="globe" size={30} />{t('compareTitle')}</b>
           <span className="small" style={{ color: 'var(--text)' }}>{loc(compare, lang)}</span>
         </div>
       )}
@@ -261,7 +265,7 @@ function RecapIntro({ recap, t, lang, sound }) {
     <>
       <div className="col" style={{ alignItems: 'center', textAlign: 'center', gap: 10, paddingTop: 8 }}>
         <Mascot emotion="explaining" size={150} />
-        <div className="h1">{t('recapTitle')} 💭</div>
+        <div className="h1">{t('recapTitle')}</div>
         {recap.note && <p className="sub" style={{ fontSize: 17 }}>{loc(recap.note, lang).replace(/^\s*(Згадаймо|Вспомним)\s*:\s*/i, '')}</p>}
       </div>
       {recap.rule && (
@@ -307,7 +311,7 @@ function Result({ finished, mode, nav, t, lang, steps, results, unit, level, tit
         <div className="h2">{t('newBadge')}</div>
         <div className="list" style={{ width: '100%' }}>
           {badges.map((id) => { const b = badgeById(id); return (
-            <div key={id} className="card row"><span style={{ fontSize: 32 }}>{b.icon}</span><div className="col" style={{ gap: 2 }}><b>{loc(b.title, lang)}</b><span className="small">{loc(b.desc, lang)}</span></div></div>
+            <div key={id} className="card row"><Tile icon={b.icon} size={48} /><div className="col" style={{ gap: 2 }}><b>{loc(b.title, lang)}</b><span className="small">{loc(b.desc, lang)}</span></div></div>
           ); })}
         </div>
         <button className="btn" onClick={advance}>{t('continue')} <Icon name="arrow" size={18} /></button>
@@ -328,9 +332,9 @@ function Result({ finished, mode, nav, t, lang, steps, results, unit, level, tit
         {!passed && <p className="small">{t('cpNeed', { need: Math.round(PASS * 100) })}</p>}
       </div>
       <div className="row" style={{ gap: 10 }}>
-        <div className="card stat"><b>⭐ +{xp}</b><span>XP</span></div>
-        {streakUp && <div className="card stat"><b>🔥 {streakAlive(state)}</b><span>{t('streakDay')}</span></div>}
-        <div className="card stat"><b>{Math.round(acc * 100)}%</b><span>{t('accuracy')}</span></div>
+        <div className="card stat"><Tile icon="star" size={36} /><b>+{xp}</b><span>XP</span></div>
+        {streakUp && <div className="card stat"><Tile icon="flame" size={36} tone="warn" /><b>{streakAlive(state)}</b><span>{t('streakDay')}</span></div>}
+        <div className="card stat"><Tile icon="target" size={36} tone="ok" /><b>{Math.round(acc * 100)}%</b><span>{t('accuracy')}</span></div>
       </div>
       {wrong.length > 0 && (
         <div className="col" style={{ gap: 8 }}>

@@ -5,7 +5,7 @@ import { buildPath } from '../lib/progress.js';
 import { loc } from '../lib/loc.js';
 import { haptic } from '../lib/telegram.js';
 import { speak } from '../lib/tts.js';
-import { Mascot, Icon, TopBar, Speak, Sheet, Bar, Confetti } from '../components.jsx';
+import { Mascot, Icon, TopBar, Speak, Sheet, Bar, Confetti, Tile } from '../components.jsx';
 import { LEVELS } from '../lib/content.js';
 
 // Words from units the learner has opened.
@@ -39,7 +39,7 @@ export default function Words({ nav, t, lang }) {
     <div className="screen with-nav">
       <TopBar title={t('wordsTitle')} />
       <button className="card row" style={{ background: 'linear-gradient(135deg, var(--primary), #a48bdc)', color: '#fff', textAlign: 'left' }} onClick={() => nav.push({ name: 'cards' })} disabled={!words.length}>
-        <span style={{ fontSize: 30 }}>🃏</span>
+        <Tile icon="cards" size={44} tone="white" />
         <span className="col grow" style={{ gap: 0 }}>
           <b style={{ fontSize: 18 }}>{t('cardsReview')}</b>
           <span style={{ fontSize: 13, opacity: 0.9 }}>{due.length ? t('cardsDue', { n: due.length }) : t('cardsNone')}</span>
@@ -66,7 +66,7 @@ export default function Words({ nav, t, lang }) {
                 <span className="row" style={{ gap: 8 }}><b className="en">{w.word}</b><span className="tiny">{w.ipa}</span></span>
                 <span className="small">{loc(w, lang)}</span>
               </span>
-              {c?.learned ? <span style={{ color: 'var(--ok)' }}>✓</span> : c ? <span className="tiny">{'●'.repeat(c.box)}{'○'.repeat(Math.max(0, 2 - c.box))}</span> : <span className="tiny">{t('newW')}</span>}
+              {c?.learned ? <span style={{ color: 'var(--ok)' }}><Icon name="check" size={18} stroke={2.6} /></span> : c ? <span className="tiny">{'●'.repeat(c.box)}{'○'.repeat(Math.max(0, 2 - c.box))}</span> : <span className="tiny">{t('newW')}</span>}
             </button>
           );
         })}
@@ -146,7 +146,7 @@ export function Cards({ nav, t, lang }) {
             <div className="small en">{w.example}</div>
           </>
         ) : (
-          <div className="tiny" style={{ marginTop: 20 }}>👆 {t('showAnswer')}</div>
+          <div className="tiny row" style={{ marginTop: 20, gap: 6 }}><Icon name="hand" size={16} />{t('showAnswer')}</div>
         )}
       </button>
       <div className="grow" />

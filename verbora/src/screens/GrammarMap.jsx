@@ -4,7 +4,7 @@ import { buildPath, topicStatus, levelUnlocked } from '../lib/progress.js';
 import { unitTopics } from '../lib/content.js';
 import { TOPIC_NAMES } from '../lib/i18n.js';
 import { loc } from '../lib/loc.js';
-import { TopBar, Icon } from '../components.jsx';
+import { TopBar, Icon, Tile } from '../components.jsx';
 
 // Grammar map (SPEC §4.2): 🟢 know · 🟡 shaky · 🔴 gap · 🔒 locked
 export default function GrammarMap({ nav, t, lang }) {
@@ -19,7 +19,7 @@ export default function GrammarMap({ nav, t, lang }) {
       </div>
       {state.mistakes.length > 0 && (
         <button className="card row" style={{ textAlign: 'left' }} onClick={() => nav.push({ name: 'lesson', mode: 'mistakes' })}>
-          <span style={{ fontSize: 24 }}>🔁</span>
+          <Tile icon="refresh" tone="warn" />
           <span className="col grow" style={{ gap: 0 }}><b>{t('workOnMistakes')}</b><span className="small">{t('workOnMistakesSub', { n: Math.min(state.mistakes.length, 10) })}</span></span>
           <Icon name="chevron" />
         </button>
@@ -48,7 +48,7 @@ export default function GrammarMap({ nav, t, lang }) {
                   <div key={u.id} className="col" style={{ gap: 6, padding: '10px 0', borderTop: i ? '1px solid var(--line)' : 'none' }}>
                     <div className="row" style={{ gap: 10 }}>
                       <span className={`status-dot st-${unitSt}`} />
-                      <span className="grow" style={{ fontWeight: 700, fontSize: 15, opacity: unitSt === 'locked' ? 0.55 : 1 }}>{u.kind === 'vocab' ? '📗' : '🔤'} {loc(u.title, lang)}</span>
+                      <span className="grow" style={{ fontWeight: 700, fontSize: 15, opacity: unitSt === 'locked' ? 0.55 : 1 }}><span className="ic" style={{ color: 'var(--primary-2)', marginRight: 6 }}><Icon name={u.kind === 'vocab' ? 'book' : 'grammar'} size={16} /></span>{loc(u.title, lang)}</span>
                       {!u.data && <span className="tiny">{t('comingSoon')}</span>}
                     </div>
                     {u.data && u.unlocked && topics.length > 0 && (

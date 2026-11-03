@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { loc } from '../lib/loc.js';
-import { matches, normalize, shuffle, hashSeed } from '../lib/check.js';
+import { matches, normalize, shuffle, hashSeed, gapSentences, answerIndex } from '../lib/check.js';
 import { speak } from '../lib/tts.js';
 import { haptic } from '../lib/telegram.js';
 import { Icon, Speak } from '../components.jsx';
@@ -14,13 +14,7 @@ import { Icon, Speak } from '../components.jsx';
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
-// For picked options the answer is one exact option: case matters here ("TA-ble" ≠ "ta-BLE").
-// Lenient matching (case, spaces, final dot) applies only to typed answers.
-export function answerIndex(options, answer, lang) {
-  const a = loc(answer, lang);
-  const exact = options.findIndex((o) => loc(o, lang) === a);
-  return exact >= 0 ? exact : options.findIndex((o) => normalize(loc(o, lang)) === normalize(a));
-}
+
 
 function Question({ text }) {
   // highlight the gap
@@ -52,6 +46,8 @@ function Choices({ options, lang, picked, setPicked, locked, answer, seed }) {
             <span className="letter">{LETTERS[k]}</span>
             <span className="title en">{o}</span>
             {picked === i && !locked && <span className="check"><Icon name="check" size={14} stroke={3} /></span>}
+            {locked && isAns && <span className="check mark-ok"><Icon name="check" size={14} stroke={3} /></span>}
+            {locked && !isAns && picked === i && <span className="check mark-bad"><Icon name="close" size={13} stroke={3} /></span>}
           </button>
         );
       })}
@@ -90,10 +86,10 @@ export function Listen({ ex, lang, t, locked, sound, onChange }) {
       <div className="row" style={{ justifyContent: 'center', gap: 18, padding: '8px 0' }}>
         <Speak lg text={ex.audio_text} audio={ex.audio} enabled={sound} label={t('listen')} />
         <button className="speak" onClick={() => speak(ex.audio_text, { audio: ex.audio, slow: true, enabled: sound })} aria-label={t('slow')}>
-          <span style={{ fontSize: 18 }}>🐢</span>
+          <Icon name="slow" size={18} />
         </button>
       </div>
-      {!sound && <div className="tiny" style={{ textAlign: 'center' }}>🔇 {ex.audio_text}</div>}
+      {!sound && <div className="tiny row" style={{ justifyContent: 'center', gap: 6 }}><Icon name="mute" size={16} />{ex.audio_text}</div>}
       <Choices options={ex.options} lang={lang} picked={picked} setPicked={setPicked} locked={locked} answer={ex.answer} seed={hashSeed(ex.id)} />
     </>
   );
@@ -133,37 +129,38 @@ function TextAnswer({ value, setValue, locked, ok, placeholder, multiline, autoF
   return multiline ? <textarea {...props} rows={3} style={{ resize: 'none' }} /> : <input {...props} />;
 }
 
-function useText(ex, onChange, answer, accept, initial = '') {
+function useText(ex, onChange, answer, accept, initial = '', opts) {
   const [value, setValue] = useState(initial);
   const [ok, setOk] = useState(false);
   useEffect(() => {
     onChange({
       ready: normalize(value).length > 0 && normalize(value) !== normalize(initial),
-      evaluate: () => { const r = matches(value, answer, accept); setOk(r); return { ok: r, answer }; },
+      evaluate: () => { const r = matches(value, answer, accept, opts); setOk(r); return { ok: r, answer }; },
     });
   }, [value]);
   return [value, setValue, ok];
 }
 
 export function Fill({ ex, lang, t, locked, onChange }) {
-  const [value, setValue, ok] = useText(ex, onChange, ex.answer, ex.accept);
+  const variants = [ex.answer, ...(ex.accept || [])];
+  const [value, setValue, ok] = useText(ex, onChange, ex.answer, [...(ex.accept || []), ...gapSentences(ex.question, variants)]);
   const parts = String(ex.question).split('___');
   return (
     <>
       <div className="small">{t('fillGap')}</div>
       <div className="h2 en" style={{ lineHeight: 1.5 }}>
         {parts[0]}
-        <span style={{ color: locked ? (ok ? 'var(--ok)' : 'var(--bad)') : 'var(--primary-2)', borderBottom: '3px solid currentColor', padding: '0 6px' }}>{value || '    '}</span>
+        <span style={{ color: locked ? (ok ? 'var(--ok)' : 'var(--bad)') : 'var(--primary-2)', borderBottom: '3px solid currentColor', padding: '0 6px' }}>{locked && ok ? ex.answer : value.trim().split(/\s+/).length > 2 ? '\u00a0…\u00a0' : value || '    '}</span>
         {parts.slice(1).join('___')}
       </div>
-      {ex.hint && <div className="pill">💡 {t('hint')}: {loc(ex.hint, lang)}</div>}
+      {ex.hint && <div className="pill" style={{ alignSelf: 'flex-start' }}><span className="ic"><Icon name="bulb" size={15} /></span>{t('hint')}: {loc(ex.hint, lang)}</div>}
       <TextAnswer value={value} setValue={setValue} locked={locked} ok={ok} placeholder={t('typeHere')} />
     </>
   );
 }
 
 export function Fix({ ex, lang, t, locked, onChange }) {
-  const [value, setValue, ok] = useText(ex, onChange, ex.answer, ex.accept, ex.sentence);
+  const [value, setValue, ok] = useText(ex, onChange, ex.answer, ex.accept, ex.sentence, { shortForms: true });
   return (
     <>
       <div className="small">{t('fixError')}</div>
@@ -174,7 +171,7 @@ export function Fix({ ex, lang, t, locked, onChange }) {
 }
 
 export function Translate({ ex, lang, t, locked, onChange }) {
-  const [value, setValue, ok] = useText(ex, onChange, ex.answer, ex.accept);
+  const [value, setValue, ok] = useText(ex, onChange, ex.answer, ex.accept, '', { shortForms: true });
   return (
     <>
       <div className="small">{t('translateTo')}</div>
@@ -449,7 +446,7 @@ export function Reading({ ex, lang, t, locked, sound, onChange }) {
       <div className="small">{t('readingTitle')}</div>
       <div className="card col" style={{ gap: 10 }}>
         <div className="row between">
-          <span className="pill">📖 Text</span>
+          <span className="pill"><span className="ic"><Icon name="text" size={15} /></span>Text</span>
           <Speak text={fullText} audio={ex.audio} enabled={sound} />
         </div>
         {ex.text && <p className="en" style={{ fontSize: 17, lineHeight: 1.6, fontWeight: 600 }}>{ex.text}</p>}

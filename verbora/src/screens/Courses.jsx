@@ -4,7 +4,7 @@ import { transcription, ipaSounds } from '../lib/content.js';
 import { loc } from '../lib/loc.js';
 import { speak } from '../lib/tts.js';
 import { haptic } from '../lib/telegram.js';
-import { TopBar, Icon, Mascot, Bar } from '../components.jsx';
+import { TopBar, Icon, Mascot, Bar, Tile } from '../components.jsx';
 
 export default function Courses({ nav, t, lang }) {
   const { state } = useStore();
@@ -30,14 +30,14 @@ export default function Courses({ nav, t, lang }) {
             const open = i === 0 || state.lessonsDone[u.lessons[i - 1].id] || passed;
             return (
               <button key={l.id} className={`option ${open ? '' : 'dim'}`} disabled={!open} onClick={() => nav.push({ name: 'lesson', mode: 'lesson', lessonId: l.id })}>
-                <span className="ico" style={isDone ? { background: 'var(--ok-soft)', color: 'var(--ok)' } : {}}>{isDone ? '✓' : open ? i + 1 : <Icon name="lock" size={16} />}</span>
+                <span className="ico" style={isDone ? { background: 'var(--ok-soft)', color: 'var(--ok)' } : {}}>{isDone ? <Icon name="check" size={18} stroke={2.6} /> : open ? i + 1 : <Icon name="lock" size={16} />}</span>
                 <span className="title grow">{loc(l.title, lang)}</span>
                 <Icon name="chevron" />
               </button>
             );
           })}
           <button className={`option ${done === u.lessons.length || passed ? '' : 'dim'}`} disabled={!(done === u.lessons.length || passed)} onClick={() => nav.push({ name: 'lesson', mode: 'checkpoint', unitId: u.id })}>
-            <span className="ico">{passed ? '🏅' : '🏁'}</span>
+            <span className="ico"><Icon name={passed ? 'medal' : 'flag'} size={20} stroke={1.8} /></span>
             <span className="title grow">{t('finalChallenge')}</span>
             <Icon name="chevron" />
           </button>
@@ -48,9 +48,9 @@ export default function Courses({ nav, t, lang }) {
         <span className="col grow" style={{ gap: 0 }}><b>{t('soundTable')}</b><span className="small">{t('soundTableSub')}</span></span>
         <Icon name="chevron" />
       </button>
-      {[[t('ieltsSoon'), '🎓'], [t('nicheSoon'), '💼']].map(([title, em]) => (
+      {[[t('ieltsSoon'), 'cap'], [t('nicheSoon'), 'briefcase']].map(([title, em]) => (
         <div key={title} className="card soft row" style={{ opacity: 0.6 }}>
-          <span style={{ fontSize: 24 }}>{em}</span>
+          <Tile icon={em} tone="plain" />
           <span className="grow" style={{ fontWeight: 700 }}>{title}</span>
           <span className="tiny">{t('comingSoon')}</span>
         </div>

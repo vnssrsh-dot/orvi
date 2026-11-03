@@ -4,7 +4,7 @@ import { buildPath, levelPercent, levelUnlocked, nextStep } from '../lib/progres
 import { LEVELS, levelInfo } from '../lib/content.js';
 import { loc } from '../lib/loc.js';
 import { haptic } from '../lib/telegram.js';
-import { Mascot, Icon, Bar, Sheet } from '../components.jsx';
+import { Mascot, Icon, Bar, Sheet, Tile } from '../components.jsx';
 
 const UNIT_COLORS = ['#8b6fd0', '#e58fb5', '#5fb3c9', '#f0a868', '#7bc08f', '#a08ae0'];
 const OFFSETS = [0, 62, 92, 62, 0, -62, -92, -62];
@@ -39,9 +39,9 @@ export default function Home({ nav, t, lang }) {
 
   const daily = state.daily;
   const missions = [
-    { label: t('mLesson'), cur: Math.min(daily.lessons, 1), max: 1, icon: '📘' },
-    { label: t('mWords'), cur: Math.min(daily.words, 5), max: 5, icon: '🃏' },
-    { label: t('mCorrect'), cur: Math.min(daily.correct, 15), max: 15, icon: '🎯' },
+    { label: t('mLesson'), cur: Math.min(daily.lessons, 1), max: 1, icon: 'book' },
+    { label: t('mWords'), cur: Math.min(daily.words, 5), max: 5, icon: 'cards' },
+    { label: t('mCorrect'), cur: Math.min(daily.correct, 15), max: 15, icon: 'target' },
   ];
 
   return (
@@ -49,8 +49,8 @@ export default function Home({ nav, t, lang }) {
       <div className="row between">
         <div className="logo" style={{ fontSize: 30 }}>verbora</div>
         <div className="row" style={{ gap: 6 }}>
-          <span className="pill" title={t('streak')}>🔥 {streak}</span>
-          <span className="pill">⭐ {state.xp}</span>
+          <span className="pill" title={t('streak')} style={{ background: 'var(--warn-soft)', color: 'var(--warn)' }}><span className="ic"><Icon name="flame" size={15} /></span>{streak}</span>
+          <span className="pill"><span className="ic"><Icon name="star" size={15} /></span>{state.xp}</span>
           <button className="icon-btn" onClick={() => nav.push({ name: 'settings' })} aria-label={t('settings')}><Icon name="gear" /></button>
         </div>
       </div>
@@ -59,8 +59,8 @@ export default function Home({ nav, t, lang }) {
       <div className="card" style={{ background: 'linear-gradient(135deg, var(--surface) 30%, var(--primary-soft))', position: 'relative', overflow: 'hidden' }}>
         <div className="row" style={{ alignItems: 'flex-start' }}>
           <div className="col grow" style={{ gap: 4 }}>
-            <div className="h3">{name ? t('hiName', { name }) : t('hiAnon')} 👋</div>
-            <div className="small">{lost ? '💔 ' : ''}{t('readyToday')}</div>
+            <div className="h3">{name ? t('hiName', { name }) : t('hiAnon')}</div>
+            <div className="small">{t('readyToday')}</div>
             <div style={{ height: 10 }} />
             <div className="small">{t('yourLevel')}</div>
             <div className="h3">{level} — {loc(levelInfo(level).title, lang)}</div>
@@ -79,7 +79,7 @@ export default function Home({ nav, t, lang }) {
       <div className="chips" style={{ justifyContent: 'center' }}>
         {LEVELS.map((l) => (
           <button key={l} className={`chip ${l === level ? 'on' : ''}`} disabled={!levelUnlocked(state, l)} onClick={() => { haptic('select'); setLevel(l); }}>
-            {!levelUnlocked(state, l) && '🔒 '}{l}
+            {!levelUnlocked(state, l) && <span className="ic" style={{ marginRight: 4 }}><Icon name="lock" size={13} /></span>}{l}
           </button>
         ))}
       </div>
@@ -98,7 +98,7 @@ export default function Home({ nav, t, lang }) {
 
       {state.mistakes.length >= 3 && (
         <button className="card row" style={{ textAlign: 'left' }} onClick={() => nav.push({ name: 'lesson', mode: 'mistakes' })}>
-          <span style={{ fontSize: 24 }}>🔁</span>
+          <Tile icon="refresh" tone="warn" />
           <span className="col grow" style={{ gap: 0 }}><b>{t('workOnMistakes')}</b><span className="small">{t('workOnMistakesSub', { n: Math.min(state.mistakes.length, 10) })}</span></span>
           <Icon name="chevron" />
         </button>
@@ -108,12 +108,11 @@ export default function Home({ nav, t, lang }) {
         <b>{t('missions')}</b>
         {missions.map((m) => (
           <div key={m.label} className="row" style={{ gap: 10 }}>
-            <span>{m.icon}</span>
+            <Tile icon={m.icon} size={34} tone={m.cur >= m.max ? 'ok' : 'primary'} />
             <div className="col grow" style={{ gap: 4 }}>
               <div className="row between"><span className="small" style={{ color: 'var(--text)' }}>{m.label}</span><span className="tiny">{m.cur}/{m.max}</span></div>
               <Bar value={(m.cur / m.max) * 100} style={{ height: 6 }} />
             </div>
-            {m.cur >= m.max && <span>✅</span>}
           </div>
         ))}
       </div>
@@ -157,7 +156,7 @@ function Serpentine({ path, state, t, lang, level, onLesson, onCheckpoint, onLev
             <div key={u.id} className="card soft row" style={{ opacity: 0.65, padding: '10px 14px' }}>
               <span style={{ width: 34, height: 34, borderRadius: 12, background: 'var(--bg-2)', display: 'grid', placeItems: 'center' }}><Icon name="lock" size={16} /></span>
               <span className="col grow" style={{ gap: 0 }}>
-                <span className="tiny">{u.kind === 'vocab' ? '📗' : '🔤'} {t('unit')} {ui + 1} · {u.planned} {t('lessons')}</span>
+                <span className="tiny">{t('unit')} {ui + 1} · {u.kind === 'vocab' ? t('kindVocab') : t('kindGrammar')} · {u.planned} {t('lessons')}</span>
                 <b style={{ fontSize: 14 }}>{loc(u.title, lang)}</b>
               </span>
               <span className="tiny">{t('comingSoon')}</span>
@@ -172,14 +171,14 @@ function Serpentine({ path, state, t, lang, level, onLesson, onCheckpoint, onLev
           <section key={u.id} className="col" style={{ gap: 12, marginTop: 8 }}>
             <div className="card row" style={{ background: color, color: '#fff', boxShadow: `0 8px 20px ${color}55` }}>
               <div className="col grow" style={{ gap: 0 }}>
-                <span style={{ fontSize: 12, fontWeight: 800, opacity: 0.85 }}>{u.kind === 'vocab' ? '📗' : '🔤'} {t('unit')} {ui + 1}</span>
+                <span style={{ fontSize: 12, fontWeight: 800, opacity: 0.85 }}>{t('unit')} {ui + 1} · {u.kind === 'vocab' ? t('kindVocab') : t('kindGrammar')}</span>
                 <b style={{ fontSize: 18 }}>{loc(u.title, lang)}</b>
               </div>
-              {u.complete && <span style={{ fontSize: 22 }}>🏆</span>}
+              <Tile icon={u.complete ? 'trophy' : u.kind === 'vocab' ? 'book' : 'grammar'} size={42} tone="white" />
               {u.canJump && (
                 <button className="btn sm" style={{ background: 'rgba(255,255,255,.25)', boxShadow: 'none', color: '#fff' }}
                   onClick={() => onLocked({ title: t('skipUnit'), text: t('jumpHint'), emotion: 'surprised', action: () => onCheckpoint(u.data), actionLabel: t('checkpoint') })}>
-                  ⤴ {t('checkpoint')}
+                  <Icon name="jump" size={16} /> {t('checkpoint')}
                 </button>
               )}
             </div>
@@ -193,7 +192,7 @@ function Serpentine({ path, state, t, lang, level, onLesson, onCheckpoint, onLev
                 const isCp = n.type === 'checkpoint';
                 const st = n.status;
                 const bg = st === 'locked' ? 'var(--bg-2)' : st === 'done' ? color : st === 'refresh' ? 'var(--warn)' : color;
-                const icon = isCp ? (st === 'done' ? '🏆' : st === 'locked' ? '🔒' : '🎁') : st === 'done' ? '✓' : st === 'locked' ? '🔒' : st === 'refresh' ? '🔁' : '★';
+                const iconName = isCp ? (st === 'done' ? 'trophy' : st === 'locked' ? 'lock' : 'gift') : st === 'done' ? 'check' : st === 'locked' ? 'lock' : st === 'refresh' ? 'refresh' : 'star';
                 const click = () => {
                   if (st === 'locked') return onLocked({ title: t('locked'), text: isCp ? t('checkpointSub') : loc(n.title, lang), emotion: 'thinking' });
                   if (isCp) onCheckpoint(u.data); else onLesson(u.data, u.data.lessons[n.index]);
@@ -204,11 +203,11 @@ function Serpentine({ path, state, t, lang, level, onLesson, onCheckpoint, onLev
                       className={st === 'current' ? 'pulse' : ''}
                       style={{
                         width: NODE, height: NODE, borderRadius: isCp ? 22 : '50%', background: bg,
-                        color: st === 'locked' ? 'var(--muted)' : '#fff', fontSize: isCp ? 28 : 26, fontWeight: 800,
+                        color: st === 'locked' ? 'var(--muted)' : '#fff', display: 'grid', placeItems: 'center',
                         boxShadow: st === 'locked' ? 'inset 0 -5px 0 rgba(0,0,0,.06)' : `inset 0 -6px 0 rgba(0,0,0,.15), 0 6px 14px ${color}55`,
                         border: st === 'current' ? '4px solid var(--surface)' : 'none', outline: st === 'current' ? `3px solid ${color}` : 'none',
                       }}>
-                      {icon}
+                      <Icon name={iconName} size={isCp ? 28 : 26} stroke={st === 'done' ? 3 : 2.2} fill={st === 'current' || st === 'available' ? (isCp ? 'none' : 'currentColor') : 'none'} />
                     </button>
                     <span className="tiny" style={{ marginTop: 4, width: 120, textAlign: 'center', fontWeight: 700, color: st === 'locked' ? 'var(--muted)' : 'var(--text-2)', lineHeight: 1.15 }}>
                       {isCp ? t('checkpoint') : loc(n.title, lang)}
@@ -228,7 +227,7 @@ function Serpentine({ path, state, t, lang, level, onLesson, onCheckpoint, onLev
       {path.anyContent && (
         <button className="card row" style={{ marginTop: 10, opacity: path.finalTest === 'locked' ? 0.6 : 1 }}
           onClick={() => (path.finalTest === 'locked' ? onLocked({ title: t('levelTest'), text: t('locked'), emotion: 'thinking' }) : onLevelTest())}>
-          <span style={{ fontSize: 30 }}>{path.finalTest === 'done' ? '👑' : '🏁'}</span>
+          <Tile icon={path.finalTest === 'done' ? 'crown' : 'flag'} size={44} tone={path.finalTest === 'locked' ? 'plain' : 'primary'} />
           <span className="col grow" style={{ gap: 0, textAlign: 'left' }}><b>{t('levelTest')} {level}</b><span className="small">25 · {t('checkpointSub')}</span></span>
           {path.finalTest === 'locked' ? <Icon name="lock" /> : <Icon name="chevron" />}
         </button>

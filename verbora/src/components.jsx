@@ -68,7 +68,7 @@ const P = {
   check: 'M5 12l5 5 9-10',
   star: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.5 2.9 1-6.1L3.2 9.5l6.1-.9z',
   refresh: 'M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6',
-  flame: 'M12 3s5 4.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 1.5-4S9 12 11 12c0-4 1-7 1-9z',
+  flame: 'M12 21.5c3.9 0 7-2.8 7-6.8 0-3.4-2-5.9-3.9-7.9-.2 2.3-1.4 3.8-2.9 4.3.2-3.3-1-6.6-3.7-8.6.1 3.8-3.5 6.2-3.5 12.1 0 4 3.1 6.9 7 6.9z',
   play: 'M8 5l11 7-11 7z',
   bolt: 'M13 2L4 14h7l-1 8 9-12h-7z',
   heart: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
@@ -87,6 +87,20 @@ const P = {
   chevron: 'M9 6l6 6-6 6',
   trophy: 'M8 4h8v5a4 4 0 0 1-8 0zM8 6H4a3 3 0 0 0 4 4M16 6h4a3 3 0 0 1-4 4M12 13v4M8 20h8',
   target: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 12h.01',
+  gem: 'M6 3h12l3 6-9 12L3 9zM3 9h18M9 3l3 6 3-6M12 9v12',
+  books: 'M4 4h4v16H4zM10 4h4v16h-4zM15.5 5.2l3.4-.9 3.6 14.7-3.4.9z',
+  medal: 'M8 3l2.5 6.5M16 3l-2.5 6.5M12 21a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM12 13v4',
+  crown: 'M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z',
+  question: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.2a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.5M12 17h.01',
+  grammar: 'M4 19l5-14 5 14M6 14h6M15 19v-6.5a2.5 2.5 0 0 1 5 0V19M15 15.5h5',
+  jump: 'M7 17L17 7M8 7h9v9',
+  mute: 'M11 5L6 9H3v6h3l5 4zM16 9.5l5 5M21 9.5l-5 5',
+  bulb: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z',
+  text: 'M5 6h14M5 10h14M5 14h10M5 18h7',
+  slow: 'M4 16a8 8 0 1 1 16 0M12 16l-4-4M3 20h18',
+  rocket: 'M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2M9 15l-3-3c1-4 5-9 13-9 0 8-5 12-9 13zM14.5 8a1.5 1.5 0 1 0 1.5 1.5',
+  hand: 'M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10V4.5a1.5 1.5 0 0 1 3 0V11M14 10.5V6a1.5 1.5 0 0 1 3 0v7c0 4.5-2.5 8-7 8-3 0-4.5-1.5-6-4l-1.5-3a1.5 1.5 0 0 1 2.6-1.5L8 15',
+
 };
 
 export function Icon({ name, size = 22, stroke = 2, fill = 'none', style }) {
@@ -94,6 +108,15 @@ export function Icon({ name, size = 22, stroke = 2, fill = 'none', style }) {
     <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" style={style} aria-hidden>
       <path d={P[name]} />
     </svg>
+  );
+}
+
+// Soft rounded tile with a line icon — the icon treatment from Valeria's mockups.
+export function Tile({ icon, size = 40, tone = 'primary', style }) {
+  return (
+    <span className={`tile tile-${tone}`} style={{ width: size, height: size, ...style }}>
+      <Icon name={icon} size={Math.round(size * 0.5)} stroke={1.8} />
+    </span>
   );
 }
 

@@ -6,7 +6,7 @@ import { BADGES } from '../lib/badges.js';
 import { TOPIC_NAMES } from '../lib/i18n.js';
 import { loc } from '../lib/loc.js';
 import { tgUser } from '../lib/telegram.js';
-import { TopBar, Icon, Mascot, Bar, Toggle, Sheet } from '../components.jsx';
+import { TopBar, Icon, Mascot, Bar, Toggle, Sheet, Tile } from '../components.jsx';
 
 function weekDates() {
   const d = new Date();
@@ -35,9 +35,9 @@ export default function Profile({ nav, t, lang }) {
         <Bar value={pct} style={{ width: 160 }} />
       </div>
       <div className="row" style={{ gap: 10 }}>
-        <div className="card stat"><b>🔥 {streak}</b><span>{t('days')}</span></div>
-        <div className="card stat"><b>⭐ {state.xp}</b><span>{t('xp')}</span></div>
-        <div className="card stat"><b>📚 {learned}</b><span>{t('learned')}</span></div>
+        <div className="card stat"><Tile icon="flame" size={36} tone="warn" /><b>{streak}</b><span>{t('days')}</span></div>
+        <div className="card stat"><Tile icon="star" size={36} /><b>{state.xp}</b><span>{t('xp')}</span></div>
+        <div className="card stat"><Tile icon="books" size={36} tone="ok" /><b>{learned}</b><span>{t('learned')}</span></div>
       </div>
 
       <div className="card col" style={{ gap: 12 }}>
@@ -49,7 +49,7 @@ export default function Profile({ nav, t, lang }) {
             return (
               <div key={d} className="col" style={{ alignItems: 'center', gap: 4 }}>
                 <span className="tiny">{t('weekDays')[i]}</span>
-                <span style={{ width: 30, height: 30, borderRadius: '50%', display: 'grid', placeItems: 'center', background: on ? 'var(--primary)' : 'var(--bg-2)', color: on ? '#fff' : 'var(--muted)', fontSize: 14, outline: isToday ? '2px solid var(--primary)' : 'none', outlineOffset: 2 }}>{on ? '✓' : ''}</span>
+                <span style={{ width: 30, height: 30, borderRadius: '50%', display: 'grid', placeItems: 'center', background: on ? 'var(--primary)' : 'var(--bg-2)', color: on ? '#fff' : 'var(--muted)', fontSize: 14, outline: isToday ? '2px solid var(--primary)' : 'none', outlineOffset: 2 }}>{on ? <Icon name="check" size={15} stroke={3} /> : null}</span>
               </div>
             );
           })}
@@ -87,10 +87,10 @@ export default function Profile({ nav, t, lang }) {
         <div className="grid3">
           {BADGES.map((b) => {
             const got = state.badges[b.id];
-            if (b.hidden && !got) return <div key={b.id} className="card badge-tile off"><span className="em">❓</span><span className="tiny">???</span></div>;
+            if (b.hidden && !got) return <div key={b.id} className="card badge-tile off"><Tile icon="question" size={52} tone="plain" /><span className="tiny">???</span></div>;
             return (
               <div key={b.id} className={`card badge-tile ${got ? '' : 'off'}`}>
-                <span className="em">{b.icon}</span>
+                <Tile icon={b.icon} size={52} tone={got ? 'primary' : 'plain'} />
                 <b style={{ fontSize: 12 }}>{loc(b.title, lang)}</b>
                 <span className="tiny">{loc(b.desc, lang)}</span>
               </div>
@@ -118,7 +118,7 @@ export function Settings({ nav, t, lang }) {
       <div className="card col" style={{ gap: 10 }}>
         <b>{t('language')}</b>
         <div className="grid2">
-          {[['ua', '🇺🇦 Українська'], ['ru', '🌐 Русский']].map(([id, label]) => (
+          {[['ua', 'Українська'], ['ru', 'Русский']].map(([id, label]) => (
             <button key={id} className={`option ${lang === id ? 'sel' : ''}`} style={{ minHeight: 50, justifyContent: 'center' }} onClick={() => update((s) => { s.lang = id; })}>
               <span className="title">{label}</span>
             </button>

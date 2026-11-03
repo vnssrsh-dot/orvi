@@ -5,7 +5,7 @@ import { diagnostic, LEVELS, levelPath } from '../lib/content.js';
 import { TOPIC_NAMES } from '../lib/i18n.js';
 import { loc } from '../lib/loc.js';
 import { shuffle } from '../lib/check.js';
-import { Mascot, Icon, Dots, Option, Bar } from '../components.jsx';
+import { Mascot, Icon, Dots, Option, Bar, Tile } from '../components.jsx';
 
 const STEPS = ['splash', 'lang', 'hello', 'verbi', 'mission', 'experience', 'goal', 'minutes', 'diagIntro', 'diag', 'diagResult'];
 
@@ -58,8 +58,8 @@ export default function Onboarding({ t, lang }) {
     const sug = suggestedLang();
     const current = state.lang || sug;
     const opts = [
-      { id: 'ua', flag: '🇺🇦', title: 'Українська', sub: 'Пояснення українською' },
-      { id: 'ru', flag: '🌐', title: 'Русский', sub: 'Объяснения на русском' },
+      { id: 'ua', flag: 'UA', title: 'Українська', sub: 'Пояснення українською' },
+      { id: 'ru', flag: 'RU', title: 'Русский', sub: 'Объяснения на русском' },
     ];
     if (sug === 'ru') opts.reverse();
     return (
@@ -71,7 +71,7 @@ export default function Onboarding({ t, lang }) {
         </div>
         <div className="list">
           {opts.map((o) => (
-            <Option key={o.id} icon={<span>{o.flag}</span>} title={o.title} sub={o.sub} selected={current === o.id} onClick={() => update((s) => { s.lang = o.id; })} />
+            <Option key={o.id} icon={<span style={{ fontWeight: 800, fontSize: 14 }}>{o.flag}</span>} title={o.title} sub={o.sub} selected={current === o.id} onClick={() => update((s) => { s.lang = o.id; })} />
           ))}
         </div>
         <div className="grow" />
@@ -85,8 +85,8 @@ export default function Onboarding({ t, lang }) {
     const i = story[step];
     const content = [
       { e: 'greeting', h: t('hello'), p: t('welcome') },
-      { e: 'speaking', h: `${t('iAmVerbi')} ✨`, p: t('verbiIntro') },
-      { e: 'thanks', h: '🚀', p: t('verbiMission') },
+      { e: 'speaking', h: t('iAmVerbi'), p: t('verbiIntro') },
+      { e: 'thanks', h: t('ourMission'), p: t('verbiMission') },
     ][i];
     const nextStep = ['verbi', 'mission', 'experience'][i];
     return (
