@@ -1,0 +1,40 @@
+{
+  "_comment": "Адаптивний діагностичний тест (SPEC §3). Питання згруповані за рівнями; topic — тег для карти граматики.",
+  "length": 15,
+  "questions": [
+    { "id": "d-a1-01", "level": "A1", "topic": "to-be-forms", "type": "choose", "question": "My brother ___ a doctor.", "options": ["am", "is", "are", "be"], "answer": "is" },
+    { "id": "d-a1-02", "level": "A1", "topic": "to-be-negative", "type": "choose", "question": "They ___ at home now.", "options": ["isn't", "aren't", "not", "don't"], "answer": "aren't" },
+    { "id": "d-a1-03", "level": "A1", "topic": "present-simple", "type": "choose", "question": "She ___ in a bank.", "options": ["work", "works", "working", "is work"], "answer": "works" },
+    { "id": "d-a1-04", "level": "A1", "topic": "there-is", "type": "choose", "question": "___ two cats in the garden.", "options": ["There is", "There are", "It is", "They are"], "answer": "There are" },
+    { "id": "d-a1-05", "level": "A1", "topic": "past-was-were", "type": "choose", "question": "We ___ in Lviv last week.", "options": ["was", "were", "are", "be"], "answer": "were" },
+    { "id": "d-a1-06", "level": "A1", "topic": "articles", "type": "choose", "question": "I have ___ apple.", "options": ["a", "an", "the", "—"], "answer": "an" },
+
+    { "id": "d-a2-01", "level": "A2", "topic": "past-irregular", "type": "choose", "question": "Yesterday I ___ to the cinema.", "options": ["go", "goed", "went", "gone"], "answer": "went" },
+    { "id": "d-a2-02", "level": "A2", "topic": "past-continuous", "type": "choose", "question": "I ___ TV when you called.", "options": ["watched", "was watching", "am watching", "watch"], "answer": "was watching" },
+    { "id": "d-a2-03", "level": "A2", "topic": "comparatives", "type": "choose", "question": "This bag is ___ than that one.", "options": ["more cheap", "cheaper", "cheapest", "the cheaper"], "answer": "cheaper" },
+    { "id": "d-a2-04", "level": "A2", "topic": "going-to", "type": "choose", "question": "Look at the clouds! It ___ rain.", "options": ["will", "is going to", "goes to", "is raining to"], "answer": "is going to" },
+    { "id": "d-a2-05", "level": "A2", "topic": "present-perfect", "type": "choose", "question": "Have you ever ___ sushi?", "options": ["eat", "ate", "eaten", "eating"], "answer": "eaten" },
+    { "id": "d-a2-06", "level": "A2", "topic": "much-many", "type": "choose", "question": "How ___ money do you need?", "options": ["many", "much", "lot", "few"], "answer": "much" },
+
+    { "id": "d-b1-01", "level": "B1", "topic": "perfect-vs-past", "type": "choose", "question": "I ___ here since 2022.", "options": ["live", "lived", "have lived", "am living"], "answer": "have lived" },
+    { "id": "d-b1-02", "level": "B1", "topic": "second-conditional", "type": "choose", "question": "If I ___ more time, I would learn Spanish.", "options": ["have", "had", "will have", "would have"], "answer": "had" },
+    { "id": "d-b1-03", "level": "B1", "topic": "passive", "type": "choose", "question": "This bridge ___ in 1890.", "options": ["built", "was built", "is building", "has built"], "answer": "was built" },
+    { "id": "d-b1-04", "level": "B1", "topic": "used-to", "type": "choose", "question": "I ___ play football every day when I was a child.", "options": ["use to", "used to", "was used to", "am used to"], "answer": "used to" },
+    { "id": "d-b1-05", "level": "B1", "topic": "reported-speech", "type": "choose", "question": "She said she ___ tired.", "options": ["is", "was", "were", "be"], "answer": "was" },
+    { "id": "d-b1-06", "level": "B1", "topic": "gerund-infinitive", "type": "choose", "question": "Please remember ___ the door.", "options": ["lock", "locking", "to lock", "locked"], "answer": "to lock" },
+
+    { "id": "d-b2-01", "level": "B2", "topic": "third-conditional", "type": "choose", "question": "If she had left earlier, she ___ the train.", "options": ["would catch", "would have caught", "caught", "had caught"], "answer": "would have caught" },
+    { "id": "d-b2-02", "level": "B2", "topic": "modals-past", "type": "choose", "question": "He isn't answering. He ___ his phone at home.", "options": ["must leave", "must have left", "should leave", "can have left"], "answer": "must have left" },
+    { "id": "d-b2-03", "level": "B2", "topic": "wish", "type": "choose", "question": "I wish I ___ that. I'm sorry.", "options": ["didn't say", "hadn't said", "wouldn't say", "don't say"], "answer": "hadn't said" },
+    { "id": "d-b2-04", "level": "B2", "topic": "future-perfect", "type": "choose", "question": "By next June, I ___ my degree.", "options": ["will finish", "will have finished", "finish", "am finishing"], "answer": "will have finished" },
+    { "id": "d-b2-05", "level": "B2", "topic": "causative", "type": "choose", "question": "I need to ___ my car repaired.", "options": ["make", "have", "let", "do"], "answer": "have" },
+    { "id": "d-b2-06", "level": "B2", "topic": "passive-advanced", "type": "choose", "question": "The new law is said ___ next year.", "options": ["to come into force", "coming into force", "that it comes into force", "come into force"], "answer": "to come into force" },
+
+    { "id": "d-c1-01", "level": "C1", "topic": "inversion", "type": "choose", "question": "Never ___ such a beautiful sunset.", "options": ["I have seen", "have I seen", "I saw", "did I saw"], "answer": "have I seen" },
+    { "id": "d-c1-02", "level": "C1", "topic": "subjunctive", "type": "choose", "question": "The doctor insisted that he ___ smoking.", "options": ["stops", "stop", "stopped", "will stop"], "answer": "stop" },
+    { "id": "d-c1-03", "level": "C1", "topic": "inversion", "type": "choose", "question": "No sooner ___ home than it started to rain.", "options": ["I had got", "had I got", "I got", "did I got"], "answer": "had I got" },
+    { "id": "d-c1-04", "level": "C1", "topic": "cleft", "type": "choose", "question": "___ I need is a long holiday.", "options": ["That", "What", "Which", "It"], "answer": "What" },
+    { "id": "d-c1-05", "level": "C1", "topic": "future-in-past", "type": "choose", "question": "I ___ call you, but my phone died.", "options": ["was going to", "will", "am going to", "would have"], "answer": "was going to" },
+    { "id": "d-c1-06", "level": "C1", "topic": "idioms", "type": "choose", "question": "Don't worry, the exam was a piece of ___.", "options": ["cake", "bread", "pie", "sugar"], "answer": "cake" }
+  ]
+}

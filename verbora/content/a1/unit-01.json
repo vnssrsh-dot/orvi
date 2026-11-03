@@ -1,0 +1,1474 @@
+{
+  "id": "a1-u01",
+  "level": "A1",
+  "order": 1,
+  "kind": "grammar",
+  "title": {
+    "en": "To be: am / is / are",
+    "ua": "Дієслово to be: am / is / are",
+    "ru": "Глагол to be: am / is / are"
+  },
+  "rule": {
+    "formula": "I → am · He / She / It → is · We / You / They → are",
+    "explain": {
+      "ua": "To be означає «бути, є». В українській ми його пропускаємо: «Я вчитель». В англійській він обов'язковий: I am a teacher. Форма залежить від того, про кого йдеться.",
+      "ru": "To be означает «быть, являться». В русском мы его пропускаем: «Я учитель». В английском он обязателен: I am a teacher. Форма зависит от того, о ком идёт речь."
+    },
+    "examples": [
+      {
+        "en": "I am a student.",
+        "ua": "Я студент.",
+        "ru": "Я студент."
+      },
+      {
+        "en": "She is from Ukraine.",
+        "ua": "Вона з України.",
+        "ru": "Она из Украины."
+      },
+      {
+        "en": "They are happy.",
+        "ua": "Вони щасливі.",
+        "ru": "Они счастливы."
+      }
+    ],
+    "compare": {
+      "ua": "Українською: «Він лікар» (без дієслова). Англійською: He IS a doctor — без is речення неправильне.",
+      "ru": "По-русски: «Он врач» (без глагола). По-английски: He IS a doctor — без is предложение неправильное."
+    }
+  },
+  "vocab": [
+    {
+      "word": "student",
+      "ipa": "/ˈstjuːdnt/",
+      "ua": "студент",
+      "ru": "студент",
+      "example": "I am a student.",
+      "audio": ""
+    },
+    {
+      "word": "teacher",
+      "ipa": "/ˈtiːtʃə/",
+      "ua": "вчитель",
+      "ru": "учитель",
+      "example": "She is a teacher.",
+      "audio": ""
+    },
+    {
+      "word": "doctor",
+      "ipa": "/ˈdɒktə/",
+      "ua": "лікар",
+      "ru": "врач",
+      "example": "He is a doctor.",
+      "audio": ""
+    },
+    {
+      "word": "friend",
+      "ipa": "/frend/",
+      "ua": "друг",
+      "ru": "друг",
+      "example": "You are my friend.",
+      "audio": ""
+    },
+    {
+      "word": "happy",
+      "ipa": "/ˈhæpi/",
+      "ua": "щасливий",
+      "ru": "счастливый",
+      "example": "We are happy.",
+      "audio": ""
+    },
+    {
+      "word": "tired",
+      "ipa": "/ˈtaɪəd/",
+      "ua": "втомлений",
+      "ru": "уставший",
+      "example": "I am tired.",
+      "audio": ""
+    },
+    {
+      "word": "busy",
+      "ipa": "/ˈbɪzi/",
+      "ua": "зайнятий",
+      "ru": "занятый",
+      "example": "They are busy.",
+      "audio": ""
+    },
+    {
+      "word": "ready",
+      "ipa": "/ˈredi/",
+      "ua": "готовий",
+      "ru": "готовый",
+      "example": "We are ready.",
+      "audio": ""
+    },
+    {
+      "word": "hungry",
+      "ipa": "/ˈhʌŋɡri/",
+      "ua": "голодний",
+      "ru": "голодный",
+      "example": "They are hungry.",
+      "audio": ""
+    },
+    {
+      "word": "kind",
+      "ipa": "/kaɪnd/",
+      "ua": "добрий",
+      "ru": "добрый",
+      "example": "You are kind.",
+      "audio": ""
+    },
+    {
+      "word": "from",
+      "ipa": "/frɒm/",
+      "ua": "з, із",
+      "ru": "из",
+      "example": "I am from Odesa.",
+      "audio": ""
+    },
+    {
+      "word": "at home",
+      "ipa": "/ət ˈhəʊm/",
+      "ua": "вдома",
+      "ru": "дома",
+      "example": "She is at home.",
+      "audio": ""
+    },
+    {
+      "word": "cat",
+      "ipa": "/kæt/",
+      "ua": "кіт",
+      "ru": "кот",
+      "example": "It is a cat.",
+      "audio": ""
+    },
+    {
+      "word": "dog",
+      "ipa": "/dɒɡ/",
+      "ua": "собака",
+      "ru": "собака",
+      "example": "The dog is big.",
+      "audio": ""
+    },
+    {
+      "word": "big",
+      "ipa": "/bɪɡ/",
+      "ua": "великий",
+      "ru": "большой",
+      "example": "The dog is big.",
+      "audio": ""
+    },
+    {
+      "word": "small",
+      "ipa": "/smɔːl/",
+      "ua": "маленький",
+      "ru": "маленький",
+      "example": "The cat is small.",
+      "audio": ""
+    }
+  ],
+  "lessons": [
+    {
+      "id": "a1-u01-l01",
+      "title": {
+        "en": "I am, you are",
+        "ua": "I am, you are",
+        "ru": "I am, you are"
+      },
+      "recap": null,
+      "rule": {
+        "formula": "I → am · You → are",
+        "explain": {
+          "ua": "З I завжди am. З you завжди are — і коли «ти», і коли «ви».",
+          "ru": "С I всегда am. С you всегда are — и когда «ты», и когда «вы»."
+        },
+        "examples": [
+          {
+            "en": "I am Anna.",
+            "ua": "Я Анна.",
+            "ru": "Я Анна."
+          },
+          {
+            "en": "You are my friend.",
+            "ua": "Ти мій друг.",
+            "ru": "Ты мой друг."
+          },
+          {
+            "en": "You are students.",
+            "ua": "Ви студенти.",
+            "ru": "Вы студенты."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "I ___ Anna.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "am",
+          "explain": {
+            "ua": "З I завжди am.",
+            "ru": "С I всегда am."
+          },
+          "id": "a1-u01-l01-e01"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "You ___ my friend.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "are",
+          "explain": {
+            "ua": "You → are.",
+            "ru": "You → are."
+          },
+          "id": "a1-u01-l01-e02"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "I ___ from Ukraine.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "am",
+          "explain": {
+            "ua": "I → am.",
+            "ru": "I → am."
+          },
+          "id": "a1-u01-l01-e03"
+        },
+        {
+          "type": "match",
+          "topic": "vocab",
+          "pairs": [
+            {
+              "left": "student",
+              "right": {
+                "ua": "студент",
+                "ru": "студент"
+              }
+            },
+            {
+              "left": "friend",
+              "right": {
+                "ua": "друг",
+                "ru": "друг"
+              }
+            },
+            {
+              "left": "teacher",
+              "right": {
+                "ua": "вчитель",
+                "ru": "учитель"
+              }
+            },
+            {
+              "left": "happy",
+              "right": {
+                "ua": "щасливий",
+                "ru": "счастливый"
+              }
+            }
+          ],
+          "explain": {
+            "ua": "Повтори ці слова в картках юніту.",
+            "ru": "Повтори эти слова в карточках юнита."
+          },
+          "id": "a1-u01-l01-e04"
+        },
+        {
+          "type": "fill",
+          "topic": "to-be-forms",
+          "question": "You ___ a teacher.",
+          "answer": "are",
+          "accept": [],
+          "explain": {
+            "ua": "You → are, навіть про одну людину.",
+            "ru": "You → are, даже об одном человеке."
+          },
+          "id": "a1-u01-l01-e05"
+        },
+        {
+          "type": "listen",
+          "topic": "to-be-forms",
+          "audio_text": "I am tired.",
+          "options": [
+            "I am tired.",
+            "You are tired.",
+            "I am tiny."
+          ],
+          "answer": "I am tired.",
+          "audio": "",
+          "explain": {
+            "ua": "Прислухайся: I am — «ай ем».",
+            "ru": "Прислушайся: I am — «ай эм»."
+          },
+          "id": "a1-u01-l01-e06"
+        },
+        {
+          "type": "build",
+          "topic": "to-be-word-order",
+          "words": [
+            "am",
+            "I",
+            "a",
+            "student"
+          ],
+          "answer": "I am a student",
+          "explain": {
+            "ua": "Порядок: хто → am → решта.",
+            "ru": "Порядок: кто → am → остальное."
+          },
+          "id": "a1-u01-l01-e07"
+        },
+        {
+          "type": "fix",
+          "topic": "to-be-forms",
+          "sentence": "I are happy.",
+          "answer": "I am happy.",
+          "accept": [],
+          "explain": {
+            "ua": "З I тільки am, не are.",
+            "ru": "С I только am, не are."
+          },
+          "id": "a1-u01-l01-e08"
+        },
+        {
+          "type": "translate",
+          "topic": "to-be-missing",
+          "prompt": {
+            "ua": "Ти мій друг.",
+            "ru": "Ты мой друг."
+          },
+          "answer": "You are my friend.",
+          "accept": [
+            "You're my friend."
+          ],
+          "explain": {
+            "ua": "В англійській дієслово обов'язкове: You ARE my friend.",
+            "ru": "В английском глагол обязателен: You ARE my friend."
+          },
+          "id": "a1-u01-l01-e09"
+        }
+      ]
+    },
+    {
+      "id": "a1-u01-l02",
+      "title": {
+        "en": "He is, she is, it is",
+        "ua": "He is, she is, it is",
+        "ru": "He is, she is, it is"
+      },
+      "recap": {
+        "from": "a1-u01-l01",
+        "note": {
+          "ua": "Згадаймо: I → am, you → are.",
+          "ru": "Вспомним: I → am, you → are."
+        },
+        "exercises": [
+          {
+            "type": "choose",
+            "topic": "to-be-forms",
+            "question": "I ___ busy.",
+            "options": [
+              "am",
+              "is",
+              "are"
+            ],
+            "answer": "am",
+            "explain": {
+              "ua": "I → am.",
+              "ru": "I → am."
+            },
+            "id": "a1-u01-l02-r01"
+          },
+          {
+            "type": "choose",
+            "topic": "to-be-forms",
+            "question": "You ___ happy.",
+            "options": [
+              "am",
+              "is",
+              "are"
+            ],
+            "answer": "are",
+            "explain": {
+              "ua": "You → are.",
+              "ru": "You → are."
+            },
+            "id": "a1-u01-l02-r02"
+          }
+        ]
+      },
+      "rule": {
+        "formula": "He / She / It → is",
+        "explain": {
+          "ua": "Про одну людину або річ — is. It — це «воно»: про предмети й тварин. Anna = she, Max = he, the cat = it.",
+          "ru": "Об одном человеке или предмете — is. It — это «оно»: о предметах и животных. Anna = she, Max = he, the cat = it."
+        },
+        "examples": [
+          {
+            "en": "He is a doctor.",
+            "ua": "Він лікар.",
+            "ru": "Он врач."
+          },
+          {
+            "en": "She is from Odesa.",
+            "ua": "Вона з Одеси.",
+            "ru": "Она из Одессы."
+          },
+          {
+            "en": "It is a cat.",
+            "ua": "Це кіт.",
+            "ru": "Это кот."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "She ___ a doctor.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "is",
+          "explain": {
+            "ua": "She → is.",
+            "ru": "She → is."
+          },
+          "id": "a1-u01-l02-e01"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "He ___ from Odesa.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "is",
+          "explain": {
+            "ua": "He → is.",
+            "ru": "He → is."
+          },
+          "id": "a1-u01-l02-e02"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "It ___ a cat.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "is",
+          "explain": {
+            "ua": "It → is.",
+            "ru": "It → is."
+          },
+          "id": "a1-u01-l02-e03"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "The dog ___ big.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "is",
+          "explain": {
+            "ua": "The dog = it → is.",
+            "ru": "The dog = it → is."
+          },
+          "id": "a1-u01-l02-e04"
+        },
+        {
+          "type": "fill",
+          "topic": "to-be-forms",
+          "question": "Anna ___ a student.",
+          "answer": "is",
+          "accept": [
+            "'s"
+          ],
+          "explain": {
+            "ua": "Anna = she → is.",
+            "ru": "Anna = she → is."
+          },
+          "id": "a1-u01-l02-e05"
+        },
+        {
+          "type": "wordbank",
+          "topic": "to-be-forms",
+          "bank": [
+            "am",
+            "is",
+            "are"
+          ],
+          "reuse": true,
+          "sentences": [
+            "I ___ at home.",
+            "Max ___ tired.",
+            "You ___ ready."
+          ],
+          "answers": [
+            "am",
+            "is",
+            "are"
+          ],
+          "explain": {
+            "ua": "I → am, Max = he → is, you → are.",
+            "ru": "I → am, Max = he → is, you → are."
+          },
+          "id": "a1-u01-l02-e06"
+        },
+        {
+          "type": "fix",
+          "topic": "to-be-forms",
+          "sentence": "She are busy.",
+          "answer": "She is busy.",
+          "accept": [],
+          "explain": {
+            "ua": "She → is, а не are.",
+            "ru": "She → is, а не are."
+          },
+          "id": "a1-u01-l02-e07"
+        },
+        {
+          "type": "listen",
+          "topic": "to-be-forms",
+          "audio_text": "He is a teacher.",
+          "options": [
+            "He is a teacher.",
+            "She is a teacher.",
+            "He is a doctor."
+          ],
+          "answer": "He is a teacher.",
+          "audio": "",
+          "explain": {
+            "ua": "He — «хі», she — «ші».",
+            "ru": "He — «хи», she — «ши»."
+          },
+          "id": "a1-u01-l02-e08"
+        },
+        {
+          "type": "translate",
+          "topic": "to-be-missing",
+          "prompt": {
+            "ua": "Він лікар.",
+            "ru": "Он врач."
+          },
+          "answer": "He is a doctor.",
+          "accept": [
+            "He's a doctor."
+          ],
+          "explain": {
+            "ua": "Не забувай is і артикль a: He IS A doctor.",
+            "ru": "Не забывай is и артикль a: He IS A doctor."
+          },
+          "id": "a1-u01-l02-e09"
+        },
+        {
+          "type": "ipa",
+          "topic": "vocab",
+          "ipa": "/ˈdɒktə/",
+          "options": [
+            "doctor",
+            "dog",
+            "door"
+          ],
+          "answer": "doctor",
+          "explain": {
+            "ua": "/ɒ/ — коротке «о», ˈ — наголос на першому складі.",
+            "ru": "/ɒ/ — короткое «о», ˈ — ударение на первом слоге."
+          },
+          "id": "a1-u01-l02-e10"
+        }
+      ]
+    },
+    {
+      "id": "a1-u01-l03",
+      "title": {
+        "en": "We are, they are",
+        "ua": "We are, they are",
+        "ru": "We are, they are"
+      },
+      "recap": {
+        "from": "a1-u01-l02",
+        "note": {
+          "ua": "Згадаймо: he / she / it → is.",
+          "ru": "Вспомним: he / she / it → is."
+        },
+        "exercises": [
+          {
+            "type": "choose",
+            "topic": "to-be-forms",
+            "question": "She ___ happy.",
+            "options": [
+              "am",
+              "is",
+              "are"
+            ],
+            "answer": "is",
+            "explain": {
+              "ua": "She → is.",
+              "ru": "She → is."
+            },
+            "id": "a1-u01-l03-r01"
+          },
+          {
+            "type": "fix",
+            "topic": "to-be-forms",
+            "sentence": "It are small.",
+            "answer": "It is small.",
+            "accept": [],
+            "explain": {
+              "ua": "It → is.",
+              "ru": "It → is."
+            },
+            "id": "a1-u01-l03-r02"
+          }
+        ]
+      },
+      "rule": {
+        "formula": "We / You / They → are",
+        "explain": {
+          "ua": "Коли людей або речей багато — are. Anna and Max = they. Max and I = we. The cats = they.",
+          "ru": "Когда людей или предметов много — are. Anna and Max = they. Max and I = we. The cats = they."
+        },
+        "examples": [
+          {
+            "en": "We are friends.",
+            "ua": "Ми друзі.",
+            "ru": "Мы друзья."
+          },
+          {
+            "en": "They are at home.",
+            "ua": "Вони вдома.",
+            "ru": "Они дома."
+          },
+          {
+            "en": "Anna and Max are busy.",
+            "ua": "Анна і Макс зайняті.",
+            "ru": "Анна и Макс заняты."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "We ___ friends.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "are",
+          "explain": {
+            "ua": "We → are.",
+            "ru": "We → are."
+          },
+          "id": "a1-u01-l03-e01"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "They ___ at home.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "are",
+          "explain": {
+            "ua": "They → are.",
+            "ru": "They → are."
+          },
+          "id": "a1-u01-l03-e02"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "Anna and Max ___ busy.",
+          "options": [
+            "is",
+            "are",
+            "am"
+          ],
+          "answer": "are",
+          "explain": {
+            "ua": "Anna and Max = they → are.",
+            "ru": "Anna and Max = they → are."
+          },
+          "id": "a1-u01-l03-e03"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "Max and I ___ ready.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "are",
+          "explain": {
+            "ua": "Max and I = we → are. Не плутай з I am!",
+            "ru": "Max and I = we → are. Не путай с I am!"
+          },
+          "id": "a1-u01-l03-e04"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "The cats ___ small.",
+          "options": [
+            "is",
+            "are",
+            "am"
+          ],
+          "answer": "are",
+          "explain": {
+            "ua": "The cats = they → are.",
+            "ru": "The cats = they → are."
+          },
+          "id": "a1-u01-l03-e05"
+        },
+        {
+          "type": "fill",
+          "topic": "to-be-forms",
+          "question": "They ___ hungry.",
+          "answer": "are",
+          "accept": [
+            "'re"
+          ],
+          "explain": {
+            "ua": "They → are.",
+            "ru": "They → are."
+          },
+          "id": "a1-u01-l03-e06"
+        },
+        {
+          "type": "build",
+          "topic": "to-be-word-order",
+          "words": [
+            "are",
+            "we",
+            "from",
+            "Ukraine"
+          ],
+          "answer": "We are from Ukraine",
+          "explain": {
+            "ua": "Хто → are → решта.",
+            "ru": "Кто → are → остальное."
+          },
+          "id": "a1-u01-l03-e07"
+        },
+        {
+          "type": "fix",
+          "topic": "to-be-forms",
+          "sentence": "They is happy.",
+          "answer": "They are happy.",
+          "accept": [],
+          "explain": {
+            "ua": "They → are, а не is.",
+            "ru": "They → are, а не is."
+          },
+          "id": "a1-u01-l03-e08"
+        },
+        {
+          "type": "match",
+          "topic": "to-be-forms",
+          "pairs": [
+            {
+              "left": "Anna and Max",
+              "right": "they"
+            },
+            {
+              "left": "Max and I",
+              "right": "we"
+            },
+            {
+              "left": "the dog",
+              "right": "it"
+            },
+            {
+              "left": "my mum",
+              "right": "she"
+            }
+          ],
+          "explain": {
+            "ua": "Заміни слова займенником — і одразу зрозумієш, am, is чи are.",
+            "ru": "Замени слова местоимением — и сразу поймёшь, am, is или are."
+          },
+          "id": "a1-u01-l03-e09"
+        },
+        {
+          "type": "translate",
+          "topic": "to-be-missing",
+          "prompt": {
+            "ua": "Ми готові.",
+            "ru": "Мы готовы."
+          },
+          "answer": "We are ready.",
+          "accept": [
+            "We're ready."
+          ],
+          "explain": {
+            "ua": "We → are.",
+            "ru": "We → are."
+          },
+          "id": "a1-u01-l03-e10"
+        }
+      ]
+    },
+    {
+      "id": "a1-u01-l04",
+      "title": {
+        "en": "Short forms: I'm, she's",
+        "ua": "Скорочення: I'm, she's",
+        "ru": "Сокращения: I'm, she's"
+      },
+      "recap": {
+        "from": "a1-u01-l03",
+        "note": {
+          "ua": "Згадаймо: we / you / they → are.",
+          "ru": "Вспомним: we / you / they → are."
+        },
+        "exercises": [
+          {
+            "type": "choose",
+            "topic": "to-be-forms",
+            "question": "We ___ hungry.",
+            "options": [
+              "am",
+              "is",
+              "are"
+            ],
+            "answer": "are",
+            "explain": {
+              "ua": "We → are.",
+              "ru": "We → are."
+            },
+            "id": "a1-u01-l04-r01"
+          },
+          {
+            "type": "fill",
+            "topic": "to-be-forms",
+            "question": "Anna and Max ___ friends.",
+            "answer": "are",
+            "accept": [],
+            "explain": {
+              "ua": "Anna and Max = they → are.",
+              "ru": "Anna and Max = they → are."
+            },
+            "id": "a1-u01-l04-r02"
+          }
+        ]
+      },
+      "rule": {
+        "formula": "I'm · he's · she's · it's · we're · you're · they're",
+        "explain": {
+          "ua": "У розмові та повідомленнях англійці майже завжди скорочують: апостроф ' замінює літеру. Повна форма — для офіційних текстів.",
+          "ru": "В разговоре и переписке англичане почти всегда сокращают: апостроф ' заменяет букву. Полная форма — для официальных текстов."
+        },
+        "examples": [
+          {
+            "en": "I'm tired.",
+            "ua": "Я втомлений.",
+            "ru": "Я устал."
+          },
+          {
+            "en": "She's at home.",
+            "ua": "Вона вдома.",
+            "ru": "Она дома."
+          },
+          {
+            "en": "They're my friends.",
+            "ua": "Вони мої друзі.",
+            "ru": "Они мои друзья."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "choose",
+          "topic": "to-be-short-forms",
+          "question": "I am tired. = ___ tired.",
+          "options": [
+            "I'm",
+            "Im",
+            "I's"
+          ],
+          "answer": "I'm",
+          "explain": {
+            "ua": "I am → I'm, з апострофом.",
+            "ru": "I am → I'm, с апострофом."
+          },
+          "id": "a1-u01-l04-e01"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-short-forms",
+          "question": "She is busy. = ___ busy.",
+          "options": [
+            "She's",
+            "Shes",
+            "She're"
+          ],
+          "answer": "She's",
+          "explain": {
+            "ua": "She is → she's.",
+            "ru": "She is → she's."
+          },
+          "id": "a1-u01-l04-e02"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-short-forms",
+          "question": "They are happy. = ___ happy.",
+          "options": [
+            "They're",
+            "Their",
+            "They's"
+          ],
+          "answer": "They're",
+          "explain": {
+            "ua": "They are → they're. Their — це «їхній», інше слово!",
+            "ru": "They are → they're. Their — это «их», другое слово!"
+          },
+          "id": "a1-u01-l04-e03"
+        },
+        {
+          "type": "match",
+          "topic": "to-be-short-forms",
+          "pairs": [
+            {
+              "left": "I am",
+              "right": "I'm"
+            },
+            {
+              "left": "he is",
+              "right": "he's"
+            },
+            {
+              "left": "we are",
+              "right": "we're"
+            },
+            {
+              "left": "it is",
+              "right": "it's"
+            }
+          ],
+          "explain": {
+            "ua": "Апостроф стоїть на місці зниклої літери.",
+            "ru": "Апостроф стоит на месте пропавшей буквы."
+          },
+          "id": "a1-u01-l04-e04"
+        },
+        {
+          "type": "fill",
+          "topic": "to-be-short-forms",
+          "question": "___ from Odesa.",
+          "answer": "I'm",
+          "hint": "I am",
+          "accept": [],
+          "explain": {
+            "ua": "I am → I'm.",
+            "ru": "I am → I'm."
+          },
+          "id": "a1-u01-l04-e05"
+        },
+        {
+          "type": "fill",
+          "topic": "to-be-short-forms",
+          "question": "___ my friend.",
+          "answer": "You're",
+          "hint": "you are",
+          "accept": [],
+          "explain": {
+            "ua": "You are → you're.",
+            "ru": "You are → you're."
+          },
+          "id": "a1-u01-l04-e06"
+        },
+        {
+          "type": "listen",
+          "topic": "to-be-short-forms",
+          "audio_text": "We're ready.",
+          "options": [
+            "We're ready.",
+            "We were ready.",
+            "We ready."
+          ],
+          "answer": "We're ready.",
+          "audio": "",
+          "explain": {
+            "ua": "We're звучить як «віə». Без are речення неправильне.",
+            "ru": "We're звучит как «уиə». Без are предложение неправильное."
+          },
+          "id": "a1-u01-l04-e07"
+        },
+        {
+          "type": "fix",
+          "topic": "to-be-short-forms",
+          "sentence": "Their happy.",
+          "answer": "They're happy.",
+          "accept": [],
+          "explain": {
+            "ua": "Their — «їхній». «Вони є» — they're.",
+            "ru": "Their — «их». «Они есть» — they're."
+          },
+          "id": "a1-u01-l04-e08"
+        },
+        {
+          "type": "translate",
+          "topic": "to-be-missing",
+          "prompt": {
+            "ua": "Я вдома.",
+            "ru": "Я дома."
+          },
+          "answer": "I'm at home.",
+          "accept": [
+            "I am at home."
+          ],
+          "explain": {
+            "ua": "I'm at home — at home означає «вдома».",
+            "ru": "I'm at home — at home значит «дома»."
+          },
+          "id": "a1-u01-l04-e09"
+        }
+      ]
+    },
+    {
+      "id": "a1-u01-l05",
+      "title": {
+        "en": "Practice",
+        "ua": "Практика",
+        "ru": "Практика"
+      },
+      "recap": {
+        "from": "a1-u01-l04",
+        "note": {
+          "ua": "Згадаймо скорочення: I'm, he's, they're.",
+          "ru": "Вспомним сокращения: I'm, he's, they're."
+        },
+        "exercises": [
+          {
+            "type": "choose",
+            "topic": "to-be-short-forms",
+            "question": "He is = ___",
+            "options": [
+              "He's",
+              "Hes",
+              "He're"
+            ],
+            "answer": "He's",
+            "explain": {
+              "ua": "He is → he's.",
+              "ru": "He is → he's."
+            },
+            "id": "a1-u01-l05-r01"
+          }
+        ]
+      },
+      "rule": null,
+      "exercises": [
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "My mum ___ a teacher.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "is",
+          "explain": {
+            "ua": "My mum = she → is.",
+            "ru": "My mum = she → is."
+          },
+          "id": "a1-u01-l05-e01"
+        },
+        {
+          "type": "choose",
+          "topic": "to-be-forms",
+          "question": "I ___ from Ukraine.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answer": "am",
+          "explain": {
+            "ua": "I → am.",
+            "ru": "I → am."
+          },
+          "id": "a1-u01-l05-e02"
+        },
+        {
+          "type": "wordbank",
+          "topic": "to-be-forms",
+          "bank": [
+            "am",
+            "is",
+            "are"
+          ],
+          "reuse": true,
+          "sentences": [
+            "The cat ___ small.",
+            "We ___ busy.",
+            "I ___ hungry.",
+            "You ___ kind."
+          ],
+          "answers": [
+            "is",
+            "are",
+            "am",
+            "are"
+          ],
+          "explain": {
+            "ua": "The cat = it → is; we / you → are; I → am.",
+            "ru": "The cat = it → is; we / you → are; I → am."
+          },
+          "id": "a1-u01-l05-e03"
+        },
+        {
+          "type": "reading",
+          "topic": "to-be-forms",
+          "text": "Hi! I'm Anna. I'm from Odesa. I'm a teacher. My friend Max is a doctor. He is very busy. We are happy.",
+          "audio": "",
+          "questions": [
+            {
+              "type": "choose",
+              "question": "Anna is a ___.",
+              "options": [
+                "teacher",
+                "doctor",
+                "student"
+              ],
+              "answer": "teacher"
+            },
+            {
+              "type": "truefalse",
+              "statement": "Max is a teacher.",
+              "answer": false
+            },
+            {
+              "type": "truefalse",
+              "statement": "Anna is from Odesa.",
+              "answer": true
+            }
+          ],
+          "explain": {
+            "ua": "Перечитай текст: Anna — teacher, Max — doctor.",
+            "ru": "Перечитай текст: Anna — teacher, Max — doctor."
+          },
+          "id": "a1-u01-l05-e04"
+        },
+        {
+          "type": "fix",
+          "topic": "to-be-forms",
+          "sentence": "We is ready.",
+          "answer": "We are ready.",
+          "accept": [],
+          "explain": {
+            "ua": "We → are.",
+            "ru": "We → are."
+          },
+          "id": "a1-u01-l05-e05"
+        },
+        {
+          "type": "translate",
+          "topic": "to-be-missing",
+          "prompt": {
+            "ua": "Вони зайняті.",
+            "ru": "Они заняты."
+          },
+          "answer": "They are busy.",
+          "accept": [
+            "They're busy."
+          ],
+          "explain": {
+            "ua": "They → are.",
+            "ru": "They → are."
+          },
+          "id": "a1-u01-l05-e06"
+        },
+        {
+          "type": "build",
+          "topic": "to-be-word-order",
+          "words": [
+            "is",
+            "my",
+            "friend",
+            "Max"
+          ],
+          "answer": "Max is my friend",
+          "explain": {
+            "ua": "Хто (Max) → is → решта.",
+            "ru": "Кто (Max) → is → остальное."
+          },
+          "id": "a1-u01-l05-e07"
+        },
+        {
+          "type": "listen",
+          "topic": "to-be-short-forms",
+          "audio_text": "She's at home.",
+          "options": [
+            "She's at home.",
+            "He's at home.",
+            "She's a home."
+          ],
+          "answer": "She's at home.",
+          "audio": "",
+          "explain": {
+            "ua": "She's — «шіз». At home — вдома.",
+            "ru": "She's — «шиз». At home — дома."
+          },
+          "id": "a1-u01-l05-e08"
+        },
+        {
+          "type": "ipa",
+          "topic": "vocab",
+          "ipa": "/ˈhæpi/",
+          "options": [
+            "happy",
+            "hungry",
+            "home"
+          ],
+          "answer": "happy",
+          "explain": {
+            "ua": "/æ/ — щось між «а» та «е», рот широко відкритий.",
+            "ru": "/æ/ — что-то между «а» и «э», рот широко открыт."
+          },
+          "id": "a1-u01-l05-e09"
+        },
+        {
+          "type": "translate",
+          "topic": "to-be-missing",
+          "prompt": {
+            "ua": "Кіт маленький.",
+            "ru": "Кот маленький."
+          },
+          "answer": "The cat is small.",
+          "accept": [
+            "The cat's small."
+          ],
+          "explain": {
+            "ua": "Кіт = it → is. Не забувай is!",
+            "ru": "Кот = it → is. Не забывай is!"
+          },
+          "id": "a1-u01-l05-e10"
+        }
+      ]
+    }
+  ],
+  "checkpoint": [
+    {
+      "type": "choose",
+      "topic": "to-be-forms",
+      "question": "It ___ a dog.",
+      "options": [
+        "am",
+        "is",
+        "are"
+      ],
+      "answer": "is",
+      "explain": {
+        "ua": "It → is.",
+        "ru": "It → is."
+      },
+      "id": "a1-u01-cp01"
+    },
+    {
+      "type": "choose",
+      "topic": "to-be-forms",
+      "question": "You ___ my friend.",
+      "options": [
+        "am",
+        "is",
+        "are"
+      ],
+      "answer": "are",
+      "explain": {
+        "ua": "You → are.",
+        "ru": "You → are."
+      },
+      "id": "a1-u01-cp02"
+    },
+    {
+      "type": "choose",
+      "topic": "to-be-forms",
+      "question": "Max and Anna ___ at home.",
+      "options": [
+        "is",
+        "are",
+        "am"
+      ],
+      "answer": "are",
+      "explain": {
+        "ua": "Max and Anna = they → are.",
+        "ru": "Max and Anna = they → are."
+      },
+      "id": "a1-u01-cp03"
+    },
+    {
+      "type": "fill",
+      "topic": "to-be-forms",
+      "question": "I ___ tired.",
+      "answer": "am",
+      "accept": [
+        "'m"
+      ],
+      "explain": {
+        "ua": "I → am.",
+        "ru": "I → am."
+      },
+      "id": "a1-u01-cp04"
+    },
+    {
+      "type": "fill",
+      "topic": "to-be-forms",
+      "question": "She ___ a doctor.",
+      "answer": "is",
+      "accept": [
+        "'s"
+      ],
+      "explain": {
+        "ua": "She → is.",
+        "ru": "She → is."
+      },
+      "id": "a1-u01-cp05"
+    },
+    {
+      "type": "choose",
+      "topic": "to-be-short-forms",
+      "question": "We are = ___",
+      "options": [
+        "We're",
+        "Were",
+        "We's"
+      ],
+      "answer": "We're",
+      "explain": {
+        "ua": "We are → we're.",
+        "ru": "We are → we're."
+      },
+      "id": "a1-u01-cp06"
+    },
+    {
+      "type": "fix",
+      "topic": "to-be-forms",
+      "sentence": "I is from Odesa.",
+      "answer": "I am from Odesa.",
+      "accept": [
+        "I'm from Odesa."
+      ],
+      "explain": {
+        "ua": "I → тільки am.",
+        "ru": "I → только am."
+      },
+      "id": "a1-u01-cp07"
+    },
+    {
+      "type": "fix",
+      "topic": "to-be-missing",
+      "sentence": "They happy.",
+      "answer": "They are happy.",
+      "accept": [
+        "They're happy."
+      ],
+      "explain": {
+        "ua": "В англійській to be не можна пропускати.",
+        "ru": "В английском to be нельзя пропускать."
+      },
+      "id": "a1-u01-cp08"
+    },
+    {
+      "type": "build",
+      "topic": "to-be-word-order",
+      "words": [
+        "is",
+        "small",
+        "the",
+        "cat"
+      ],
+      "answer": "The cat is small",
+      "explain": {
+        "ua": "The cat → is → small.",
+        "ru": "The cat → is → small."
+      },
+      "id": "a1-u01-cp09"
+    },
+    {
+      "type": "translate",
+      "topic": "to-be-missing",
+      "prompt": {
+        "ua": "Ми зайняті.",
+        "ru": "Мы заняты."
+      },
+      "answer": "We are busy.",
+      "accept": [
+        "We're busy."
+      ],
+      "explain": {
+        "ua": "We → are.",
+        "ru": "We → are."
+      },
+      "id": "a1-u01-cp10"
+    },
+    {
+      "type": "translate",
+      "topic": "to-be-missing",
+      "prompt": {
+        "ua": "Він з України.",
+        "ru": "Он из Украины."
+      },
+      "answer": "He is from Ukraine.",
+      "accept": [
+        "He's from Ukraine."
+      ],
+      "explain": {
+        "ua": "He → is, «з» — from.",
+        "ru": "He → is, «из» — from."
+      },
+      "id": "a1-u01-cp11"
+    },
+    {
+      "type": "listen",
+      "topic": "to-be-short-forms",
+      "audio_text": "They're friends.",
+      "options": [
+        "They're friends.",
+        "Their friends.",
+        "There friends."
+      ],
+      "answer": "They're friends.",
+      "audio": "",
+      "explain": {
+        "ua": "They're = they are. Their і there звучать так само, але значать інше.",
+        "ru": "They're = they are. Their и there звучат так же, но значат другое."
+      },
+      "id": "a1-u01-cp12"
+    }
+  ]
+}

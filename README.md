@@ -74,3 +74,7 @@ GitHub Actions (`.github/workflows/tests.yml`) запускает их при к
 ### Локальная проверка
 
 `server/.dev.vars` с тестовыми значениями `BOT_TOKEN`, `WEBHOOK_SECRET` и `TG_API` (адрес подставного Telegram API), затем `npx wrangler dev --local --test-scheduled`. Файл `.dev.vars` в репозиторий не попадает.
+
+## VERBORA
+
+В папке `verbora/` лежит отдельное приложение: Telegram Mini App для изучения английского (React + Vite). Описание и запуск — в `verbora/README.md`.
