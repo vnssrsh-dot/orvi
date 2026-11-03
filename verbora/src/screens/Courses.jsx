@@ -17,7 +17,7 @@ export default function Courses({ nav, t, lang }) {
       <div className="card col" style={{ gap: 12 }}>
         <div className="row">
           <div className="col grow" style={{ gap: 2 }}>
-            <span className="pill" style={{ alignSelf: 'flex-start' }}>/ˈ/ IPA</span>
+            <span className="pill" style={{ alignSelf: 'flex-start' }}>{t('ipaPill')}</span>
             <div className="h3" style={{ marginTop: 6 }}>{t('ipaCourse')}</div>
             <div className="small">{t('ipaCourseSub')}</div>
           </div>

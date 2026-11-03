@@ -14,6 +14,14 @@ import { Icon, Speak } from '../components.jsx';
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
+// For picked options the answer is one exact option: case matters here ("TA-ble" ≠ "ta-BLE").
+// Lenient matching (case, spaces, final dot) applies only to typed answers.
+export function answerIndex(options, answer, lang) {
+  const a = loc(answer, lang);
+  const exact = options.findIndex((o) => loc(o, lang) === a);
+  return exact >= 0 ? exact : options.findIndex((o) => normalize(loc(o, lang)) === normalize(a));
+}
+
 function Question({ text }) {
   // highlight the gap
   const parts = String(text).split('___');
@@ -31,11 +39,12 @@ function Question({ text }) {
 
 function Choices({ options, lang, picked, setPicked, locked, answer, seed }) {
   const order = useMemo(() => shuffle(options.map((o, i) => i), seed), [options, seed]);
+  const right = answerIndex(options, answer, lang);
   return (
     <div className="list">
       {order.map((i, k) => {
         const o = loc(options[i], lang);
-        const isAns = normalize(o) === normalize(loc(answer, lang));
+        const isAns = i === right;
         let state = '';
         if (locked) state = isAns ? 'ok' : picked === i ? 'bad' : 'dim';
         return (
@@ -55,7 +64,7 @@ function useChoice(ex, lang, onChange) {
   useEffect(() => {
     onChange({
       ready: picked !== null,
-      evaluate: () => ({ ok: normalize(loc(ex.options[picked], lang)) === normalize(loc(ex.answer, lang)), answer: loc(ex.answer, lang) }),
+      evaluate: () => ({ ok: picked === answerIndex(ex.options, ex.answer, lang), answer: loc(ex.answer, lang) }),
     });
   }, [picked]);
   return [picked, setPicked];
@@ -393,7 +402,7 @@ function SubQuestions({ questions, lang, t, locked, onChange, extra }) {
     onChange({
       ready: ans.every((a) => a !== null),
       evaluate: () => {
-        const ok = questions.every((q, i) => (q.type === 'truefalse' ? ans[i] === q.answer : normalize(loc(q.options[ans[i]], lang)) === normalize(loc(q.answer, lang))));
+        const ok = questions.every((q, i) => (q.type === 'truefalse' ? ans[i] === q.answer : ans[i] === answerIndex(q.options, q.answer, lang)));
         const answer = questions.map((q) => (q.type === 'truefalse' ? `${loc(q.statement, lang)} — ${q.answer ? t('true') : t('false')}` : loc(q.question, lang).replace('___', loc(q.answer, lang)))).join(' · ');
         return { ok, answer };
       },
@@ -420,7 +429,7 @@ function SubQuestions({ questions, lang, t, locked, onChange, extra }) {
               <div className="h3 en">{loc(q.question, lang)}</div>
               <div className="chips">
                 {q.options.map((o, k) => {
-                  const isAns = normalize(loc(o, lang)) === normalize(loc(q.answer, lang));
+                  const isAns = k === answerIndex(q.options, q.answer, lang);
                   const bg = locked ? (isAns ? 'var(--ok)' : ans[i] === k ? 'var(--bad)' : '') : '';
                   return <button key={k} className={`chip ${ans[i] === k && !locked ? 'on' : ''}`} style={bg ? { background: bg, color: '#fff' } : {}} disabled={locked} onClick={() => set(i, k)}>{loc(o, lang)}</button>;
                 })}

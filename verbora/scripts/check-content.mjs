@@ -29,6 +29,7 @@ function checkEx(e, where) {
   else if (!topics[e.topic]) warn.push(`${at}: topic "${e.topic}" has no name in topics.json`);
   if (!e.explain?.ua || !e.explain?.ru) errors.push(`${at}: explain needs ua and ru`);
   if (['choose', 'listen', 'ipa'].includes(e.type) && e.options && !e.options.map(str).includes(str(e.answer))) errors.push(`${at}: answer is not among options`);
+  if (e.options && e.options.length !== new Set(e.options.map(str)).size) errors.push(`${at}: duplicate options`);
   if (['fill', 'wordbank'].includes(e.type)) {
     const s = e.type === 'fill' ? [e.question] : e.sentences;
     for (const x of s || []) if (!String(x).includes('___')) errors.push(`${at}: "${x}" has no ___ gap`);
