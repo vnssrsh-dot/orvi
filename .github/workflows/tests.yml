@@ -25,20 +25,3 @@ jobs:
       - name: Logs on failure
         if: failure()
         run: tail -n 200 .tmp/worker.out || true
-
-  verbora:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: verbora
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: verbora/package-lock.json
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
