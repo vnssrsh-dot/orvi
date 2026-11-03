@@ -11,7 +11,17 @@ function initData(u, extra = {}) {
   f.hash = crypto.createHmac('sha256', key).update(dcs).digest('hex');
   return new URLSearchParams(f).toString();
 }
-const call = (u, p, b) => fetch(APP + '/api/' + p, { method: b ? 'POST' : 'GET', headers: { 'content-type': 'application/json', 'x-init-data': initData(u) }, body: b ? JSON.stringify(b) : undefined }).then(r => r.json());
+// wrangler dev may restart its local server mid-request and answer a POST with this 503
+// ("Only GET or HEAD requests are retried automatically"); repeating the request is the documented fix.
+const RESTARTED = /Your worker restarted mid-request/;
+const call = async (u, p, b) => {
+  for (let attempt = 0; ; attempt++) {
+    const r = await fetch(APP + '/api/' + p, { method: b ? 'POST' : 'GET', headers: { 'content-type': 'application/json', 'x-init-data': initData(u) }, body: b ? JSON.stringify(b) : undefined });
+    const text = await r.text();
+    if (r.status === 503 && RESTARTED.test(text) && attempt < 3) { await sleep(500); continue; }
+    return JSON.parse(text);
+  }
+};
 const hook = (u, text = '/start') => fetch(APP + '/bot/' + SECRET, { method: 'POST', headers: { 'content-type': 'application/json', 'x-telegram-bot-api-secret-token': SECRET }, body: JSON.stringify({ message: { chat: { type: 'private', id: u.id }, from: u, text } }) });
 const log = () => fs.existsSync(LOG) ? fs.readFileSync(LOG, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse) : [];
 const sent = () => log().filter(x => x.m === 'sendMessage' && x.ok).map(x => ({ to: x.b.chat_id, text: x.b.text, btn: x.b.reply_markup && x.b.reply_markup.inline_keyboard[0][0], t: x.t }));
